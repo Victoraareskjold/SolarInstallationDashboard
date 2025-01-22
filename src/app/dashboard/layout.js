@@ -1,3 +1,11 @@
+"use client";
+import Navbar from "@/components/Navbar";
+
 export default function DashboardLayout({ children }) {
-  return <div className="bg-blue-500">{children}</div>;
+  return (
+    <div className="w-full h-full">
+      <Navbar />
+      {children}
+    </div>
+  );
 }

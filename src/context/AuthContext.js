@@ -29,14 +29,6 @@ export function AuthProvider({ children }) {
       });
   }, []);
 
-  if (loading) {
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
   return (
     <AuthContext.Provider value={{ user, loading, setLoading }}>
       {children}

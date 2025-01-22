@@ -1,5 +1,4 @@
 "use client";
-import LoginNavbar from "@/components/LoginNavbar";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -17,20 +16,7 @@ function AuthenticatedLayout({ children }) {
     }
   }, [user, loading, router]);
 
-  if (loading) {
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <LoginNavbar />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
 
 export default function RootLayout({ children }) {

@@ -9,9 +9,6 @@ export default function Navbar() {
         <li>
           <SignoutButton />
         </li>
-        <li>
-          <SignoutButton />
-        </li>
       </ul>
     </nav>
   );

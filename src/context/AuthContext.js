@@ -1,5 +1,9 @@
 "use client";
-import { onAuthStateChanged } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  onAuthStateChanged,
+  setPersistence,
+} from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../lib/firebase";
 
@@ -10,24 +14,31 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
+    setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          setUser(user);
+          setLoading(false);
+        });
 
-    return () => unsubscribe();
+        return () => unsubscribe();
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
   if (loading) {
     return (
-      <div className="w-full h-full">
-        <p style={{ textAlign: "center" }}>Loading...</p>
+      <div className="w-full h-full flex items-center justify-center">
+        <p>Loading...</p>
       </div>
     );
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, setLoading }}>
       {children}
     </AuthContext.Provider>
   );

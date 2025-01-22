@@ -1,3 +1,11 @@
+"use client";
+import SignoutButton from "@/components/SignoutButton";
+
 export default function Dashboard() {
-  return <div>Dashboard</div>;
+  return (
+    <div>
+      <p>Dashboard</p>
+      <SignoutButton />
+    </div>
+  );
 }

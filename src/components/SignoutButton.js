@@ -1,11 +1,11 @@
-import { useAuth } from "@/context/AuthContext";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { useState } from "react";
+import Loading from "./Loading";
 
 export default function SignoutButton() {
   const [error, setError] = useState("");
-  const { setLoading } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const handleSignout = async (e) => {
     e.preventDefault();
@@ -18,6 +18,10 @@ export default function SignoutButton() {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div>

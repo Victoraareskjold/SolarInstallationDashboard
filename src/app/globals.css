@@ -34,6 +34,7 @@ button:disabled {
 
 .input {
   background-color: rgba(112, 127, 144, 0.15);
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: 5px;
+  border: 2px solid rgba(112, 127, 144, 0.25);
 }

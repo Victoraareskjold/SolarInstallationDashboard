@@ -1,8 +1,9 @@
 "use client";
+import Navbar from "@/components/Navbar";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import "./globals.css";
+import "../globals.css";
 
 function AuthenticatedLayout({ children }) {
   const { user, loading } = useAuth();
@@ -10,21 +11,28 @@ function AuthenticatedLayout({ children }) {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/auth/login");
-    } else if (!loading && user) {
-      router.push("/dashboard");
+      router.push("/login");
     }
   }, [user, loading, router]);
 
-  return <>{children}</>;
+  return (
+    <>
+      {user && <Navbar />}
+      {children}
+    </>
+  );
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="h-full w-full">
-      <body className="antialiased w-full h-full bg-slate-100">
+      <body className="antialiased h-full w-full flex flex-col items-center bg-slate-100">
         <AuthProvider>
-          <AuthenticatedLayout>{children}</AuthenticatedLayout>
+          <AuthenticatedLayout>
+            <div className="w-full h-full flex flex-col justify-center items-center">
+              {children}
+            </div>
+          </AuthenticatedLayout>
         </AuthProvider>
       </body>
     </html>

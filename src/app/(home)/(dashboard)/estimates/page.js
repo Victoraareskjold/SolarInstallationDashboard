@@ -24,24 +24,28 @@ export default function Estimates() {
   };
 
   return (
-    <main>
+    <main className="h-full w-full">
       <h1>Estimater for {}</h1>
       <p>{organizationId.organization}</p>
-      {estimates.length > 0 ? (
-        <ul>
-          {estimates.map((estimate) => (
-            <li key={estimate.id}>
-              <h2>Address: {estimate.address}</h2>
-              <p>Creator: {estimate.creator}</p>
-              <p>Created at: {formatDate(estimate.createdAt)}</p>
-              <EstimateCard />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Ingen estimater funnet for denne organisasjonen.</p>
-      )}
-      <Link href="/estimates/create">Opprett nytt estimat</Link>
+      <div className="mb-12">
+        {estimates.length > 0 ? (
+          <ul className="flex flex-col">
+            {estimates.map((estimate) => (
+              <li key={estimate.id}>
+                <h2>Address: {estimate.address}</h2>
+                <p>Creator: {estimate.creator}</p>
+                <p>Created at: {formatDate(estimate.createdAt)}</p>
+                <EstimateCard />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>Ingen estimater funnet for denne organisasjonen.</p>
+        )}
+      </div>
+      <Link className="darkButton" href="/estimates/create">
+        Opprett nytt estimat
+      </Link>
       {error}
     </main>
   );

@@ -51,7 +51,11 @@ export default function CreateEstimate() {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
-          <button disabled={estimateLoading || userLoading} type="submit">
+          <button
+            className="darkButton"
+            disabled={estimateLoading || userLoading}
+            type="submit"
+          >
             Create estimate
           </button>
         </div>

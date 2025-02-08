@@ -2,7 +2,7 @@
 import Navbar from "@/components/Navbar";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import "../globals.css";
 
 function AuthenticatedLayout({ children }) {
@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <AuthenticatedLayout>
             <div className="w-full h-full flex flex-col justify-center items-center">
-              {children}
+              <Suspense>{children}</Suspense>
             </div>
           </AuthenticatedLayout>
         </AuthProvider>

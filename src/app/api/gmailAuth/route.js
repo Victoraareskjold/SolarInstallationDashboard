@@ -21,7 +21,6 @@ export async function POST(req) {
         { status: 500 }
       );
 
-    // Lagre i Firestore
     await setDoc(
       doc(db, "users", userId),
       { gmailTokens: tokens },

@@ -31,6 +31,9 @@ export default function Navbar({ isHidden }) {
           <Link href="/profile">Profile</Link>
         </li>
         <li>
+          <Link href="/email">Email</Link>
+        </li>
+        <li>
           <SignoutButton />
         </li>
       </ul>

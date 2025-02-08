@@ -25,11 +25,11 @@ function AuthenticatedLayout({ children }) {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="h-full w-full">
-      <body className="antialiased h-full w-full flex flex-col items-center bg-slate-100">
+    <html lang="en">
+      <body className="antialiased bg-slate-100">
         <AuthProvider>
           <AuthenticatedLayout>
-            <div className="w-full h-full flex flex-col justify-center items-center">
+            <div>
               <Suspense>{children}</Suspense>
             </div>
           </AuthenticatedLayout>

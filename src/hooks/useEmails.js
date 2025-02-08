@@ -2,8 +2,9 @@
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 
-export default function useEmails() {
+export default function useEmails(threadId) {
   const [emails, setEmails] = useState([]);
+  const [conversation, setConversation] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useAuth();
@@ -28,5 +29,27 @@ export default function useEmails() {
     fetchEmails();
   }, [user]);
 
-  return { emails, loading, error };
+  useEffect(() => {
+    const fetchConversation = async () => {
+      if (!user || !threadId) return;
+      try {
+        const response = await fetch(
+          `/api/getThread?userId=${user.uid}&threadId=${threadId}`
+        );
+        const data = await response.json();
+
+        if (data.error) throw new Error(data.error);
+
+        setConversation(data.conversation);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchConversation();
+  }, [user, threadId]);
+
+  return { emails, conversation, loading, error };
 }

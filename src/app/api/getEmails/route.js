@@ -1,7 +1,6 @@
 import { google } from "googleapis";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
 
 export async function GET(req) {
   try {

@@ -1,5 +1,6 @@
 "use client";
 import useEmails from "@/hooks/useEmails";
+import Link from "next/link";
 
 export default function EmailPage() {
   const { emails, loading, error } = useEmails();
@@ -7,17 +8,41 @@ export default function EmailPage() {
   if (loading) return <p>Laster inn e-poster...</p>;
   if (error) return <p>Feil: {error}</p>;
 
+  const getFromHeader = (headers) => {
+    // Finn headeren med navn "From"
+    const fromHeader = headers.find((header) => header.name === "From");
+    return fromHeader ? fromHeader.value : null;
+  };
+
   return (
-    <main className="p-4 max-w-2xl mx-auto">
+    <main className="p-4">
       <h1 className="text-2xl font-bold mb-4">📩 Innboks</h1>
-      <ul className="space-y-4">
-        {emails.map((email) => (
-          <li key={email.id} className="p-3 border rounded shadow-sm">
-            <p className="font-semibold">E-post-ID: {email.id}</p>
-            <p className="text-gray-600">{email.snippet}</p>
-          </li>
-        ))}
-      </ul>
+      <section className="">
+        <ul className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {emails.map((thread) => (
+            <li
+              key={thread.id}
+              className="border p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              <h3 className="text-lg font-semibold truncate">
+                {getFromHeader(thread.payload.headers)}
+              </h3>
+              {/* <p className="line-clamp-3 mb-4 text-gray-600">
+                {thread.snippet}
+              </p> */}
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: thread.snippet,
+                }}
+                className="line-clamp-3 mb-4 text-gray-600"
+              />
+              <Link href={`/email/${thread.id}`} className="darkButton">
+                Se samtale
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </main>
   );
 }

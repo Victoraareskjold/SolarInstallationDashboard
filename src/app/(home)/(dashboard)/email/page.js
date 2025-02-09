@@ -9,7 +9,6 @@ export default function EmailPage() {
   if (error) return <p>Feil: {error}</p>;
 
   const getFromHeader = (headers) => {
-    // Finn headeren med navn "From"
     const fromHeader = headers.find((header) => header.name === "From");
     return fromHeader ? fromHeader.value : null;
   };
@@ -17,6 +16,9 @@ export default function EmailPage() {
   return (
     <main className="p-4">
       <h1 className="text-2xl font-bold mb-4">📩 Innboks</h1>
+      <Link href="/email/send" className="darkButton ">
+        Send email
+      </Link>
       <section className="">
         <ul className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {emails.map((thread) => (

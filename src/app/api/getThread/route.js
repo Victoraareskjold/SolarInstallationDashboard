@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { Buffer } from "buffer"; // For å dekode Base64
+import { Buffer } from "buffer";
 
 export async function GET(req) {
   try {

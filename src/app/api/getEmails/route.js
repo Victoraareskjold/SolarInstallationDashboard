@@ -25,12 +25,12 @@ export async function GET(req) {
 
     const gmail = google.gmail({ version: "v1", auth });
 
-    const response = await gmail.users.messages.list({
+    const response = await gmail.users.threads.list({
       userId: "me",
       maxResults: 25,
     });
 
-    const messages = response.data.messages || [];
+    const messages = response.data.threads || [];
 
     const emails = await Promise.all(
       messages.map(async (msg) => {

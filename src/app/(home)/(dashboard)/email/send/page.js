@@ -1,15 +1,17 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function SendMailPage() {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
-    to: "victor.aareskjold@icloud.com",
-    subject: "Test",
-    message: "Dette er en test.",
+    to: "",
+    subject: "",
+    message: "",
   });
   const [status, setStatus] = useState("");
+  const router = useRouter();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,6 +33,8 @@ export default function SendMailPage() {
       const data = await response.json();
       if (response.ok) {
         setStatus("E-post sendt!");
+        alert("Email sent!");
+        router.push("/email");
       } else {
         setStatus(`Feil: ${data.error}`);
       }

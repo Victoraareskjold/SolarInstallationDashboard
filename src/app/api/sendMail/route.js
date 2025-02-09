@@ -4,12 +4,13 @@ import { doc, getDoc } from "firebase/firestore";
 
 export async function POST(req) {
   try {
-    const { to, subject, message, user } = await req.json();
+    const { user, to, subject, message, threadId, inReplyTo } =
+      await req.json();
 
     if (!user)
       return Response.json({ error: "Ingen bruker mottat" }, { status: 400 });
 
-    const userRef = doc(db, "users", user.uid);
+    const userRef = doc(db, "users", user);
     const userDoc = await getDoc(userRef);
     if (!userDoc.exists() || !userDoc.data().gmailTokens)
       return Response.json(
@@ -22,7 +23,7 @@ export async function POST(req) {
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token });
 
-    if (!to || !subject || !message) {
+    if (!to) {
       return Response.json(
         { error: "Alle feltene må fylles ut" },
         { status: 400 }
@@ -35,6 +36,8 @@ export async function POST(req) {
       `To: ${to}`,
       "Content-Type: text/html; charset=UTF-8",
       `Subject: ${subject}`,
+      inReplyTo ? `In-Reply-To: ${inReplyTo}` : "",
+      threadId ? `References ${threadId}` : "",
       "",
       message,
     ].join("\n");

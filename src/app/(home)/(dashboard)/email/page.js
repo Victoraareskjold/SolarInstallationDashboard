@@ -36,7 +36,7 @@ export default function EmailPage() {
                 dangerouslySetInnerHTML={{
                   __html: thread.snippet,
                 }}
-                className="line-clamp-3 mb-4 text-gray-600"
+                className="line-clamp-3 text-gray-600"
               />
               <Link href={`/email/${thread.id}`} className="darkButton">
                 Se samtale

@@ -1,14 +1,57 @@
 "use client";
 
+import { useAuth } from "@/context/AuthContext";
 import useEmails from "@/hooks/useEmails";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 
 export default function ThreadView() {
   const { threadId } = useParams();
-  const { conversation = [], loading, error } = useEmails(threadId);
+  const {
+    conversation = [],
+    loading: useEmailsLoading,
+    error,
+  } = useEmails(threadId);
+  const { user } = useAuth();
+
+  const [reply, setReply] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (loading) return <p>Laster samtale...</p>;
   if (error) return <p>Feil: {error}</p>;
+
+  const handleSendReply = async () => {
+    setLoading(true);
+
+    try {
+      const lastMessage = conversation[conversation.length - 1];
+      const messageId = lastMessage?.id;
+      const to = lastMessage?.from;
+
+      const response = await fetch("/api/sendMail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.uid,
+          to,
+          subject: `Re: ${lastMessage.subject}`,
+          message: reply,
+          threadId,
+          inReplyTo: messageId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Feil ved sending av svar");
+      }
+
+      setReply("");
+    } catch (err) {
+      console.error("Feil ved sending av svar: ", err);
+    }
+
+    setLoading(false);
+  };
 
   const removeInlineStyles = (htmlContent) => {
     const element = document.createElement("div");
@@ -41,15 +84,24 @@ export default function ThreadView() {
             }}
             style={{ all: "initial" }}
           />
-          {/* <div
-            dangerouslySetInnerHTML={{
-              __html: removeInlineStyles(
-                msg.body || "<p>(Ingen innhold tilgjengelig)</p>"
-              ),
-            }}
-          /> */}
         </div>
       ))}
+      <div>
+        <textarea
+          value={reply}
+          onChange={(e) => setReply(e.target.value)}
+          rows="3"
+          placeholder="Your reply..."
+          className="input w-full"
+        />
+        <button
+          disabled={loading}
+          onClick={handleSendReply}
+          className="darkButton"
+        >
+          Send
+        </button>
+      </div>
     </section>
   );
 }

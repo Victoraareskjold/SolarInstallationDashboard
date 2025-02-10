@@ -46,6 +46,7 @@ export async function GET(req) {
         const headers = email.data.payload.headers;
         const subject = headers.find((h) => h.name === "Subject")?.value || "";
         const from = headers.find((h) => h.name === "From")?.value || "";
+        const date = headers.find((h) => h.name === "Date")?.value || "";
 
         // Henter og dekoder meldingsinnholdet
         let body = "";
@@ -67,6 +68,7 @@ export async function GET(req) {
           id: email.data.id,
           subject,
           from,
+          date,
           snippet: email.data.snippet,
           body,
         };

@@ -41,7 +41,7 @@ export default function EmailPage() {
         <ul className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {emails.map((thread) => (
             <Link
-              href={`/email/${thread.id}`}
+              href={`/email/${thread.threadId}`}
               key={thread.id}
               className="border p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
             >

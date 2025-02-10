@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { db } from "@/lib/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 
 export async function POST(req) {
   try {
@@ -21,11 +21,10 @@ export async function POST(req) {
         { status: 500 }
       );
 
-    await setDoc(
-      doc(db, "users", userId),
-      { gmailTokens: tokens },
-      { merge: true }
-    );
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      mailTokens: { gmail: tokens },
+    });
 
     return Response.json({ success: true });
   } catch (error) {

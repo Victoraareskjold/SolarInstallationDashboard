@@ -41,8 +41,11 @@ export default function CreateEstimate() {
   };
 
   return (
-    <main>
-      <form onSubmit={handleCreateEstimate} className="flex flex-col gap-8">
+    <main className="h-full w-full">
+      <form
+        onSubmit={handleCreateEstimate}
+        className="flex flex-col gap-8 max-w-md"
+      >
         <div className="gap-4 flex flex-col">
           <input
             className="input"

@@ -30,19 +30,22 @@ export async function GET(req) {
       maxResults: 25,
     });
 
-    const messages = response.data.threads || [];
+    const threads = response.data.threads || [];
 
     const emails = await Promise.all(
-      messages.map(async (msg) => {
-        const email = await gmail.users.messages.get({
+      threads.map(async (thread) => {
+        const threadData = await gmail.users.threads.get({
           userId: "me",
-          id: msg.id,
+          id: thread.id,
         });
 
+        const lastMessage = threadData.data.messages.pop();
+
         return {
-          id: email.data.id,
-          snippet: email.data.snippet,
-          payload: email.data.payload,
+          id: lastMessage.id,
+          threadId: thread.id,
+          snippet: lastMessage.snippet,
+          payload: lastMessage.payload,
         };
       })
     );

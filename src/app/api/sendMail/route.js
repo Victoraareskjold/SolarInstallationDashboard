@@ -10,7 +10,7 @@ export async function POST(req) {
     if (!user)
       return Response.json({ error: "Ingen bruker mottat" }, { status: 400 });
 
-    const userRef = doc(db, "users", user);
+    const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
     if (!userDoc.exists() || !userDoc.data().gmailTokens)
       return Response.json(

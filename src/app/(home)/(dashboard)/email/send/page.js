@@ -24,7 +24,7 @@ export default function SendMailPage() {
     setStatus("Sender e-post...");
 
     try {
-      const response = await fetch(`/api/sendMail?userId=${user.uid}`, {
+      const response = await fetch(`/api/sendMail?userId=${user}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, user }),

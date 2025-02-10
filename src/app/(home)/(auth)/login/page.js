@@ -46,7 +46,7 @@ export default function LoginPage() {
       organization: organization,
       createdAt: new Date(),
     });
-    return { id: newOrganizationRef.id, name: organization };
+    return newOrganizationRef.id;
   };
 
   const handleLogin = async (e) => {
@@ -77,7 +77,7 @@ export default function LoginPage() {
           db,
           `organizations/${organizationId}/members/${user.uid}`
         );
-        await setDoc(memberRef, { role: "user", merge: true });
+        await setDoc(memberRef, { role: "user" }, { merge: true });
 
         router.push("/onboarding");
       } else {

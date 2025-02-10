@@ -1,23 +1,31 @@
 "use client";
-import ConnectEmail from "@/components/functionalButtons/ConnectGmail";
+import ConnectGmail from "@/components/functionalButtons/ConnectGmail";
+import ConnectOutlook from "@/components/functionalButtons/ConnectOutlook";
 import Loading from "@/components/Loading";
 import UpdateProfile from "@/components/UpdateProfile";
 import { useAuth } from "@/context/AuthContext";
+import { useGetMailProvider } from "@/hooks/useGetMailProvider";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Profile() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const code = searchParams.get("code");
+  const provider = searchParams.get("state");
   const { user, loading } = useAuth();
+  const { provider: currentProvider, loading: providerLoading } =
+    useGetMailProvider(user?.uid);
 
   useEffect(() => {
     const exchangeCode = async () => {
-      if (!code || !user) return;
+      if (!code || !user | !provider) return;
+
+      const apiRoute =
+        provider === "outlook" ? "/api/outlook/outlookAuth" : "/api/gmailAuth";
 
       try {
-        const response = await fetch("/api/gmailAuth", {
+        const response = await fetch(apiRoute, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code, userId: user.uid }),
@@ -37,7 +45,7 @@ export default function Profile() {
     };
 
     exchangeCode();
-  }, [code, user, router]);
+  }, [code, provider, user, router]);
 
   if (loading) {
     return <Loading />;
@@ -46,7 +54,9 @@ export default function Profile() {
   return (
     <main>
       <UpdateProfile route={""} />
-      <ConnectEmail />
+      <ConnectGmail />
+      <ConnectOutlook />
+      <p>{currentProvider}</p>
     </main>
   );
 }

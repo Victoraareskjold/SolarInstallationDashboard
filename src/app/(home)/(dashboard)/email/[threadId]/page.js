@@ -32,7 +32,7 @@ export default function ThreadView() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: user.uid,
+          user: user,
           to,
           subject: `Re: ${lastMessage.subject}`,
           message: reply,
@@ -42,7 +42,7 @@ export default function ThreadView() {
       });
 
       if (!response.ok) {
-        throw new Error("Feil ved sending av svar");
+        throw new Error("Feil ved sending av svaret!");
       }
 
       setReply("");
@@ -66,17 +66,53 @@ export default function ThreadView() {
     return element.innerHTML;
   };
 
+  console.log(conversation);
+
+  const getDateHeader = (headers) => {
+    const fromDate = headers.find((header) => header.name === "Date");
+    if (fromDate) {
+      const date = new Date(fromDate.value);
+      return date.toLocaleDateString("nb-NO", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+    return null;
+  };
+
+  const formatDate = (date) => {
+    if (date) {
+      const newDate = new Date(date);
+      return newDate.toLocaleDateString("nb-NO", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+    return null;
+  };
+
+  const sortedConversation = [...conversation].sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateB - dateA;
+  });
+
   return (
     <section className="p-4">
       <h1 className="text-2xl font-bold mb-4">📩 Samtale</h1>
       <p>{threadId || "no thread id"}</p>
-      {conversation.map((msg) => (
+      {sortedConversation.map((msg) => (
         <div key={msg.id} className="border p-4 rounded shadow mb-4">
           <h2 className="text-lg font-bold">{msg.subject || "Ingen emne"}</h2>
           <p>
             <strong>Fra:</strong> {msg.from}
           </p>
           <p className="h-full w-full">{msg.content}</p>
+          <p className="h-full w-full">{formatDate(msg.date)}</p>
 
           <div
             dangerouslySetInnerHTML={{

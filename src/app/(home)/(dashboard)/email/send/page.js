@@ -1,5 +1,6 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
+import { useGetMailProvider } from "@/hooks/useGetMailProvider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -13,6 +14,9 @@ export default function SendMailPage() {
   const [status, setStatus] = useState("");
   const router = useRouter();
 
+  const { provider: currentProvider, loading: providerLoading } =
+    useGetMailProvider(user?.uid);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -24,11 +28,14 @@ export default function SendMailPage() {
     setStatus("Sender e-post...");
 
     try {
-      const response = await fetch(`/api/sendMail?userId=${user}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, user }),
-      });
+      const response = await fetch(
+        `/api/${currentProvider}/sendMail?userId=${user.uid}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...formData, userId: user.uid }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok) {

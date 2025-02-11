@@ -12,13 +12,13 @@ export async function POST(req) {
 
     const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
-    if (!userDoc.exists() || !userDoc.data().gmailTokens)
+    if (!userDoc.exists() || !userDoc.data().mailTokens.gmail)
       return Response.json(
         { error: "Ingen Gmail-tilkobling funnet" },
         { status: 400 }
       );
 
-    const { access_token } = userDoc.data().gmailTokens;
+    const { access_token } = userDoc.data().mailTokens.gmail;
 
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token });

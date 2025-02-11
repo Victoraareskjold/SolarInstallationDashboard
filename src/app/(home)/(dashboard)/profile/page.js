@@ -21,11 +21,8 @@ export default function Profile() {
     const exchangeCode = async () => {
       if (!code || !user | !provider) return;
 
-      const apiRoute =
-        provider === "outlook" ? "/api/outlook/outlookAuth" : "/api/gmailAuth";
-
       try {
-        const response = await fetch(apiRoute, {
+        const response = await fetch(`/api/${provider}/${provider}Auth`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code, userId: user.uid }),

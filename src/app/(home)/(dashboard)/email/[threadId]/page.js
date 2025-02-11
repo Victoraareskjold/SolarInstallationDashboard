@@ -1,18 +1,22 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import useEmails from "@/hooks/useEmails";
+import useEmails from "@/hooks/useMails";
+import { useGetMailProvider } from "@/hooks/useGetMailProvider";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
 export default function ThreadView() {
+  const { user } = useAuth();
   const { threadId } = useParams();
+  const { provider: currentProvider, loading: providerLoading } =
+    useGetMailProvider(user?.uid);
+  console.log(currentProvider);
   const {
     conversation = [],
     loading: useEmailsLoading,
     error,
   } = useEmails(threadId);
-  const { user } = useAuth();
 
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,7 +32,7 @@ export default function ThreadView() {
       const messageId = lastMessage?.id;
       const to = lastMessage?.from;
 
-      const response = await fetch("/api/sendMail", {
+      const response = await fetch(`/api/${currentProvider}/sendMail`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

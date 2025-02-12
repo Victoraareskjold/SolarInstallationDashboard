@@ -25,13 +25,11 @@ export default function Estimates() {
 
   return (
     <main className="h-full w-full">
-      <h1>Estimater for {}</h1>
-      <p>{organizationId.organization}</p>
       <div className="mb-12">
         {estimates.length > 0 ? (
           <ul className="flex flex-col">
             {estimates.map((estimate) => (
-              <li key={estimate.id}>
+              <li key={estimate.id} className="mt-4">
                 <h2>Address: {estimate.address}</h2>
                 <p>Creator: {estimate.creator}</p>
                 <p>Created at: {formatDate(estimate.createdAt)}</p>

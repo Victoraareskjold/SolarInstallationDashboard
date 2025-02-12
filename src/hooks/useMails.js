@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  doc,
+} from "firebase/firestore";
 
 const useMails = (userId, provider) => {
   const [mails, setMails] = useState([]);
@@ -18,18 +25,35 @@ const useMails = (userId, provider) => {
         const data = await response.json();
 
         if (response.ok) {
-          const emailsRef = collection(db, "emails");
-          const q = query(emailsRef, where("userId", "==", userId));
-          const snapshot = await getDocs(q);
-          const userEmails = snapshot.docs.map((doc) => doc.data().to);
+          if (provider == "google") {
+            console.error(
+              "Fiks opp i dette, ikke noe problem men må gjøres noe med!"
+            );
+            setMails(data.mails);
+          } else {
+            const emailRef = collection(db, "emails");
+            const emailSnapshot = query(
+              emailRef,
+              where("userId", "==", userId)
+            );
+            const snapshot = await getDocs(emailSnapshot);
+            const userEmails = snapshot.docs.map((doc) => doc.data().to);
 
-          const filteredMails = data.mails.filter((mail) =>
-            // Outlook filter for checking recipient compared to db
-            mail.toRecipients.some((to) =>
-              userEmails.includes(to.emailAddress.address)
-            )
-          );
-          setMails(filteredMails);
+            const userRef = doc(db, "users", userId);
+            const userSnapShot = await getDoc(userRef);
+            const userEmail = userSnapShot.data()?.email;
+
+            console.log(userEmail);
+
+            const filteredMails = data.mails.filter((mail) =>
+              // Outlook filter for checking recipient compared to db
+              mail.toRecipients.some((to, from) =>
+                userEmails.includes(to.emailAddress.address)
+              )
+            );
+
+            setMails(filteredMails);
+          }
         } else {
           setError("Kunne ikke hente e-poster.");
         }

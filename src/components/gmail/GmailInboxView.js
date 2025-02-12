@@ -14,12 +14,15 @@ export default function GmailInboxView({ mails }) {
       minute: "2-digit",
     });
   };
+
+  console.log(mails);
+
   return (
     <section>
       <ul className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {mails.map((thread) => (
           <Link
-            href={`/email/${thread.threadId}`}
+            href={`/email/${thread.id}`}
             key={thread.id}
             className="border p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
           >
@@ -28,7 +31,7 @@ export default function GmailInboxView({ mails }) {
 
               <div
                 dangerouslySetInnerHTML={{
-                  __html: thread.message,
+                  __html: thread.snippet,
                 }}
                 className="line-clamp-3 text-gray-600"
               />

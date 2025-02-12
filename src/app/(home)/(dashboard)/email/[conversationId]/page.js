@@ -1,27 +1,27 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import useEmails from "@/hooks/useMails";
 import { useGetMailProvider } from "@/hooks/useGetMailProvider";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import useThread from "@/hooks/useThread";
 
 export default function ThreadView() {
   const { user } = useAuth();
-  const { threadId } = useParams();
+  const { conversationId } = useParams();
   const { provider: currentProvider, loading: providerLoading } =
     useGetMailProvider(user?.uid);
-  console.log(currentProvider);
+
   const {
-    conversation = [],
+    messages,
     loading: useEmailsLoading,
     error,
-  } = useEmails(threadId);
+  } = useThread(user?.uid, currentProvider, conversationId);
 
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (loading) return <p>Laster samtale...</p>;
+  if (useEmailsLoading) return <p>Laster meldinger...</p>; // Vis lastemelding mens emails er lastet
   if (error) return <p>Feil: {error}</p>;
 
   const handleSendReply = async () => {
@@ -70,8 +70,6 @@ export default function ThreadView() {
     return element.innerHTML;
   };
 
-  console.log(conversation);
-
   const getDateHeader = (headers) => {
     const fromDate = headers.find((header) => header.name === "Date");
     if (fromDate) {
@@ -99,33 +97,31 @@ export default function ThreadView() {
     return null;
   };
 
-  const sortedConversation = [...conversation].sort((a, b) => {
+  /* const sortedConversation = [...messages].sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
     return dateB - dateA;
-  });
+  }); */
+
+  console.log(messages.mails);
 
   return (
-    <section className="p-4">
-      <h1 className="text-2xl font-bold mb-4">📩 Samtale</h1>
-      <p>{threadId || "no thread id"}</p>
-      {sortedConversation.map((msg) => (
-        <div key={msg.id} className="border p-4 rounded shadow mb-4">
-          <h2 className="text-lg font-bold">{msg.subject || "Ingen emne"}</h2>
-          <p>
-            <strong>Fra:</strong> {msg.from}
-          </p>
-          <p className="h-full w-full">{msg.content}</p>
-          <p className="h-full w-full">{formatDate(msg.date)}</p>
-
-          <div
-            dangerouslySetInnerHTML={{
-              __html: msg.body || "<p>(Ingen innhold tilgjengelig)</p>",
-            }}
-            style={{ all: "initial" }}
-          />
-        </div>
-      ))}
+    <section className="flex flex-col gap-4 p-4">
+      <h1 className="text-2xl font-bold">📩 Samtale</h1>
+      <h2>{messages.mails[0].subject}</h2>
+      <ul className="flex flex-col gap-2">
+        {messages.mails.map((msg) => (
+          <li key={msg.id} className="bg-slate-200 p-2 rounded-xl">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: msg.body.content,
+              }}
+              className="line-clamp-3 text-gray-600"
+            />
+            <p>{formatDate(msg.sentDateTime)}</p>
+          </li>
+        ))}
+      </ul>
       <div>
         <textarea
           value={reply}

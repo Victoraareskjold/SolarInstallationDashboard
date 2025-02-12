@@ -8,7 +8,7 @@ import { useGetMailProvider } from "@/hooks/useGetMailProvider";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Profile() {
+export default function ProfilePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const code = searchParams.get("code");

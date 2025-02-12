@@ -13,33 +13,34 @@ export default function OutlookInboxView({ mails }) {
     });
   };
 
-  const sortedMails = [...mails].sort((a, b) => {
+  /* const sortedMails = [...mails].sort((a, b) => {
     const dateA = new Date(a.receivedDateTime);
     const dateB = new Date(b.receivedDateTime);
     return dateB - dateA;
-  });
+  }); */
+
+  console.log(mails);
 
   return (
     <section>
       <ul className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {sortedMails.map((thread) => (
+        {mails.map((mail) => (
           <Link
-            href={`/email/${thread.threadId}`}
-            key={thread.id}
+            href={`/email/${mail.conversationId}`}
+            key={mail.conversationId}
             className="border p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
           >
             <div>
-              <h3 className="text-lg font-semibold truncate">{thread.to}</h3>
-
+              <h3 className="text-lg font-semibold truncate">{mail.to}</h3>
               <div
                 dangerouslySetInnerHTML={{
-                  __html: thread.bodyPreview,
+                  __html: mail.body.content,
                 }}
-                className="line-clamp-3 text-gray-600"
+                className="line-clamp-3 !text-gray-800"
               />
             </div>
             <div className="bg-slate-200 w-fit py-1 px-3 rounded-full text-sm font-medium mt-4">
-              {getDateFormatted(thread.receivedDateTime)}
+              {getDateFormatted(mail.receivedDateTime)}
             </div>
           </Link>
         ))}

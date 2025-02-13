@@ -25,11 +25,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div>
+    <main className="defaultContainer">
       <p>This is the dashboard for {orgData?.organization}</p>
       <p>
         Welcome {userData?.firstName} {userData?.lastName}{" "}
       </p>
-    </div>
+    </main>
   );
 }

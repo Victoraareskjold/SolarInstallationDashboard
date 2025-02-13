@@ -49,7 +49,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <main>
+    <main className="defaultContainer">
       <UpdateProfile route={""} />
       <ConnectGmail />
       <ConnectOutlook />

@@ -1,41 +1,28 @@
 import Link from "next/link";
 import SignoutButton from "./SignoutButton";
-import { useState } from "react";
+import DropdownMenu from "./DropdownMenu";
+import NavbarItem from "./NavbarItem";
 
-export default function Navbar({ isHidden }) {
-  const [isEstimateDropdownOpen, setIsEstimateDropdownOpen] = useState(false);
-
+export default function Navbar() {
   return (
-    <nav className="p-4 flex flex-row justify-between w-full bg-white shadow-sm">
+    <nav className="p-4 min-w-48 gap-8 flex flex-col h-full bg-white shadow-sm">
       <Link href="/">Dashboard</Link>
-      <ul className="flex flex-row gap-4">
-        <li className="relative">
-          <button
-            onClick={() => setIsEstimateDropdownOpen(!isEstimateDropdownOpen)}
-          >
-            Estimater &gt;
-          </button>
-          {isEstimateDropdownOpen && (
-            <ul className="absolute top-full right-full bg-white shadow-sm p-4 rounded-xl min-w-64">
-              <li>
-                <Link href="/estimates">Se alle</Link>
-              </li>
-              <li>
-                <Link href="/estimates/create">Oprett estimat</Link>
-              </li>
-            </ul>
-          )}
-        </li>
 
-        <li>
-          <Link href="/profile">Profile</Link>
-        </li>
-        <li>
-          <Link href="/email">Email</Link>
-        </li>
-        <li>
-          <SignoutButton />
-        </li>
+      <ul className="flex flex-col h-full gap-4">
+        <DropdownMenu
+          route="/clients"
+          name="Clients"
+          route1="/clients"
+          name1="View all clients"
+          route2="/clients/create"
+          name2="Create new client"
+        />
+        <DropdownMenu />
+      </ul>
+
+      <ul>
+        <NavbarItem route="/profile" name="Profile" />
+        <SignoutButton />
       </ul>
     </nav>
   );

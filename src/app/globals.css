@@ -58,3 +58,7 @@ button:disabled {
   border-radius: 5px;
   border: 2px solid rgba(112, 127, 144, 0.25);
 }
+
+.defaultContainer {
+  padding: 12px;
+}

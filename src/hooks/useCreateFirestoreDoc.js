@@ -9,10 +9,10 @@ export const useCreateFirestoreDoc = (db, collectionName) => {
   const createDoc = async (data) => {
     setLoading(true);
     setError(null);
+    setSuccess(false);
 
     try {
-      const docRef = await addDoc(collection(db, collectionName), data);
-
+      await addDoc(collection(db, collectionName), data);
       setSuccess(true);
     } catch (err) {
       setError(err.message);

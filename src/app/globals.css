@@ -25,9 +25,9 @@ h1 {
   background-color: cornflowerblue;
   color: white;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   border-radius: 5px;
-  padding: 12px 32px;
+  padding: 8px 16px;
   display: inline-block;
   text-align: center;
 }
@@ -60,5 +60,9 @@ button:disabled {
 }
 
 .defaultContainer {
-  padding: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 20px;
 }

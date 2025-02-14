@@ -3,52 +3,23 @@
 import { useCreateFirestoreDoc } from "@/hooks/useCreateFirestoreDoc";
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import ImageUploadComponent from "@/components/ImageUploadComponent";
 import Image from "next/image";
 import BackButton from "@/components/BackButton";
+import { useFirestoreDoc } from "@/hooks/useFirestoreDoc";
+import { useUpdateFirestoreDoc } from "@/hooks/useUpdateFirestoreDoc";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function CreateClientPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const clientId = searchParams.get("clientId");
   const { user, organizationId } = useAuth();
   const [solarData, setSolarData] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
-
-  /* const [solarData, setSolarData] = useState({
-    name: "asd",
-    email: "asd",
-    phone: "asd",
-    checked: true,
-    checkedRoofData: [
-      {
-        roofId: 4,
-        adjustedPanelCount: 10,
-        maxPanels: 20,
-        direction: 246,
-        angle: 0.07999999821186066,
-      },
-      {
-        roofId: 2,
-        adjustedPanelCount: 4,
-        maxPanels: 8,
-        direction: 279,
-        angle: 23.34000015258789,
-      },
-    ],
-    selectedElPrice: 1.5,
-    selectedRoofType: "Takstein (Dobbelkrummet)",
-    selectedPanelType: "Premium 440 W",
-    totalPanels: 14,
-    yearlyCost: 3025,
-    yearlyCost2: 3245,
-    yearlyProd: 5396.065,
-    address: "Strømbråtenveien 3, Vestby",
-    site: "solarinstallationdashboard",
-    desiredKWh: 13,
-    coveragePercentage: 40,
-  }); */
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -65,6 +36,30 @@ export default function CreateClientPage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (clientId) {
+      console.log(clientId);
+      const fetchClientData = async () => {
+        const clientRef = doc(db, "clients", clientId);
+        const clientSnap = await getDoc(clientRef);
+
+        if (clientSnap.exists()) {
+          const client = clientSnap.data();
+          setSolarData(client);
+          setImageUrl(client.imageUrl || null);
+        }
+      };
+
+      fetchClientData();
+    }
+  }, [clientId]);
+
+  const { data: clientData, error: clientError } = useFirestoreDoc(
+    db,
+    "clients",
+    clientId
+  );
+
   const {
     createDoc,
     error,
@@ -72,19 +67,21 @@ export default function CreateClientPage() {
     success: clientSuccess,
   } = useCreateFirestoreDoc(db, "clients");
 
+  const {
+    updateDocData,
+    error: updateError,
+    loading: updateLoading,
+    success: updateSuccess,
+  } = useUpdateFirestoreDoc(db, "clients");
+
   const handleCreateClient = async (e) => {
     e.preventDefault();
 
-    if (!solarData?.checkedRoofData) {
-      alert("SolarData missing!");
-      return;
-    }
-
-    const clientData = {
+    const clientDataToSave = {
       imageUrl: imageUrl || null,
       organizationId: organizationId || null,
       creator: user.uid,
-      createdAt: new Date() || null,
+      createdAt: clientId ? clientData?.createdAt : new Date(),
       name: solarData?.name || null,
       email: solarData?.email || null,
       phone: solarData?.phone || null,
@@ -102,8 +99,12 @@ export default function CreateClientPage() {
     };
 
     try {
-      await createDoc(clientData);
-      if (!error) {
+      if (clientId) {
+        await updateDocData(clientId, clientDataToSave);
+      } else {
+        await createDoc(clientDataToSave);
+      }
+      if (!error || !updateError) {
         router.push("/clients");
       } else {
         console.error(error);
@@ -311,7 +312,7 @@ export default function CreateClientPage() {
             type="submit"
             className="bg-blue-500 text-white p-2 mt-4"
           >
-            Opprett klient
+            {clientId ? "Update Client" : "Create Client"}
           </button>
         </form>
       </main>

@@ -5,5 +5,9 @@ export default function BackButton() {
   const handleBack = () => {
     router.back();
   };
-  return <button onClick={handleBack}>Go Back</button>;
+  return (
+    <button className="bg-slate-200 p-1" onClick={handleBack}>
+      Go Back
+    </button>
+  );
 }

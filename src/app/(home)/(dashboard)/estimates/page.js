@@ -4,7 +4,7 @@ import { db } from "@/lib/firebase";
 import { useFirestoreCollection } from "@/hooks/useFirestoreCollection";
 import Loading from "@/components/Loading";
 import Link from "next/link";
-import EstimateCard from "@/components/EstimateCard";
+import EstimateCard from "@/components/ClientCard";
 
 export default function Estimates() {
   const { user, organizationId, loading } = useAuth();

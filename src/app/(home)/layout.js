@@ -17,7 +17,7 @@ function AuthenticatedLayout({ children }) {
 
   return (
     <>
-      <main className="flex-row flex h-full">
+      <main className="flex-row flex h-full w-full">
         {user && <Navbar />}
         {children}
       </main>
@@ -27,11 +27,11 @@ function AuthenticatedLayout({ children }) {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full w-full">
       <body className="antialiased bg-slate-100 h-full">
         <AuthProvider>
           <AuthenticatedLayout>
-            <div>
+            <div className="w-full overflow-scroll">
               <Suspense>{children}</Suspense>
             </div>
           </AuthenticatedLayout>

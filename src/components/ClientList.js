@@ -3,6 +3,7 @@ import { useFirestoreCollection } from "@/hooks/useFirestoreCollection";
 import Loading from "./Loading";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
+import ClientCard from "./ClientCard";
 
 export default function ClientList() {
   const { user, organizationId, loading } = useAuth();
@@ -17,29 +18,12 @@ export default function ClientList() {
     return <Loading />;
   }
 
-  const formatDate = (timestamp) => {
-    if (!timestamp) return "No date";
-    return timestamp.toDate().toLocaleString();
-  };
-
   return (
     <section>
       {clients.length > 0 ? (
-        <ul className="flex flex-col">
+        <ul className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           {clients.map((client) => (
-            <li key={client.id} className="mt-4">
-              <h2>Address: {client.address}</h2>
-              <p>Creator: {client.creator}</p>
-              <p>Created at: {formatDate(client.createdAt)}</p>
-              {/* {client.imageUrl ? (
-                <Image
-                  src={client.imageUrl}
-                  alt="image"
-                  height={120}
-                  width={120}
-                />
-              ) : null} */}
-            </li>
+            <ClientCard key={client.id} client={client} />
           ))}
         </ul>
       ) : (

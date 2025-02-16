@@ -45,12 +45,18 @@ const useMails = (userId, provider) => {
 
             console.log(userEmail);
 
-            const filteredMails = data.mails.filter((mail) =>
-              // Outlook filter for checking recipient compared to db
-              mail.toRecipients.some((to, from) =>
-                userEmails.includes(to.emailAddress.address)
-              )
-            );
+            const filteredMails = data.mails.filter((mail) => {
+              const fromEmail = mail.from?.emailAddress?.address;
+              const toEmails =
+                mail.toRecipients.map((to) => to.emailAddress.address) || [];
+
+              return (
+                fromEmail === userEmail ||
+                toEmails.includes(userEmail) ||
+                fromEmail === clientEmail ||
+                toEmails.includes(clientEmail)
+              );
+            });
 
             setMails(filteredMails);
           }

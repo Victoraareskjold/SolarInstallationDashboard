@@ -43,12 +43,15 @@ export async function POST(req) {
       throw new Error("Kunne ikke sende e-post via Outlook");
     }
 
-    const threadId = `${userId}-${Date.now()}`;
+    const threadId = `${userId}-${to}`;
 
-    await setDoc(doc(collection(db, "emails"), to), {
+    const emailRef = doc(collection(db, "emails"), threadId);
+    await setDoc(emailRef, {
+      threadId,
       userId,
       provider: "outlook",
       to,
+      timestamp: Date.now(),
     });
 
     return Response.json({ success: true, threadId });

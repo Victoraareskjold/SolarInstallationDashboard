@@ -77,6 +77,11 @@ export default function CreateClientPage() {
   const handleCreateClient = async (e) => {
     e.preventDefault();
 
+    if (!solarData) {
+      alert("Missing solardata!");
+      return;
+    }
+
     const clientDataToSave = {
       imageUrl: imageUrl || null,
       organizationId: organizationId || null,

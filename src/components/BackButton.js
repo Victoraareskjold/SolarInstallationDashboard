@@ -6,7 +6,7 @@ export default function BackButton() {
     router.back();
   };
   return (
-    <button className="bg-slate-200 p-1" onClick={handleBack}>
+    <button className="bg-slate-200 p-1 max-w-24" onClick={handleBack}>
       Go Back
     </button>
   );

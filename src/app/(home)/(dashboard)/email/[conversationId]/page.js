@@ -21,14 +21,14 @@ export default function ThreadView() {
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (useEmailsLoading) return <p>Laster meldinger...</p>; // Vis lastemelding mens emails er lastet
+  if (useEmailsLoading) return <p>Laster meldinger...</p>;
   if (error) return <p>Feil: {error}</p>;
 
   const handleSendReply = async () => {
     setLoading(true);
 
     try {
-      const lastMessage = conversation[conversation.length - 1];
+      const lastMessage = messages[messages.length - 1];
       const messageId = lastMessage?.id;
       const to = lastMessage?.from;
 

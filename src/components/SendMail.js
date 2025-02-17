@@ -9,7 +9,7 @@ export default function SendMail({ clientId, clientData }) {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     to: clientData?.email || "",
-    subject: "",
+    subject: clientId || "",
     message: "",
   });
   const [status, setStatus] = useState("");
@@ -29,6 +29,29 @@ export default function SendMail({ clientId, clientData }) {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const [selectedTemplate, setSelectedTemplate] = useState("");
+
+  const templates = [
+    { id: 1, name: "Påminnelse", content: "Hei, husk avtalen vår..." },
+    {
+      id: 2,
+      name: "Takk for forespørsel",
+      content: "Takk for din forespørsel!",
+    },
+    {
+      id: 3,
+      name: "Send estimat",
+      content: `Vi har et tilbud for deg... Sjek denne linken: <a href="https://www.lynelektrosol.no/estimat/${clientId}">Se estimat<a/>`,
+    },
+  ];
+
+  const handleTemplateSelect = (content) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      message: content,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -94,6 +117,20 @@ export default function SendMail({ clientId, clientData }) {
           required
           className="w-full p-2 border rounded h-32"
         />
+        <div className="mt-4">
+          <p className="font-bold">Velg en mal:</p>
+          <select
+            className="w-full p-2 border rounded"
+            onChange={(e) => handleTemplateSelect(e.target.value)}
+          >
+            <option value="">Velg en mal...</option>
+            {templates.map((template) => (
+              <option key={template.id} value={template.content}>
+                {template.name}
+              </option>
+            ))}
+          </select>
+        </div>
         <button type="submit" className="bg-blue-600 text-white p-2 rounded">
           Send e-mail
         </button>

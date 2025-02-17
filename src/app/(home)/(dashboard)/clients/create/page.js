@@ -94,7 +94,7 @@ export default function CreateClientPage() {
       totalPanels: solarData?.totalPanels || null,
       selectedPanelType: solarData?.selectedPanelType || null,
       selectedRoofType: solarData?.selectedRoofType || null,
-      roofData: solarData?.checkedRoofData || null,
+      checkedRoofData: solarData?.checkedRoofData || null,
       selectedElPrice: solarData?.selectedElPrice || null,
       yearlyCost: solarData?.yearlyCost || null,
       yearlyCost2: solarData?.yearlyCost2 || null,

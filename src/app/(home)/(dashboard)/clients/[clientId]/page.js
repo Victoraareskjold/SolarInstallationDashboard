@@ -6,6 +6,7 @@ import { useFirestoreDoc } from "@/hooks/useFirestoreDoc";
 import Link from "next/link";
 import MailThread from "@/components/MailThread";
 import SendMail from "@/components/SendMail";
+import { useState } from "react";
 
 export default function ClientView() {
   const { clientId } = useParams();

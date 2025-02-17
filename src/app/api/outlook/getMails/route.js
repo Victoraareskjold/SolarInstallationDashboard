@@ -1,5 +1,6 @@
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import refreshOutlookToken from "@/hooks/refreshOutlookToken";
 
 export async function GET(req) {
   try {
@@ -20,7 +21,12 @@ export async function GET(req) {
       );
     }
 
-    const { access_token } = userDoc.data().mailTokens.outlook;
+    let { access_token, expires_in } = userDoc.data().mailTokens.outlook;
+
+    if (!expires_in || Date.now() >= expires_in) {
+      console.log("Token utløpt, fornyer...");
+      access_token = await refreshOutlookToken(userId);
+    }
 
     const response = await fetch(
       "https://graph.microsoft.com/v1.0/me/messages",

@@ -14,8 +14,6 @@ export default function ClientView() {
 
   const hasRoofData = clientData ? true : false;
 
-  //const hasSentMail = clientData?.emailData ? true : false;
-
   return (
     <main className="defaultContainer">
       <BackButton />

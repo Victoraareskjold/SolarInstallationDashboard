@@ -26,6 +26,30 @@ export default function MailThread({ clientData }) {
       ) || mail.from?.emailAddress?.address === clientData?.email
   );
 
+  const cleanMailBody = (body, isSenderYou) => {
+    // Hvis det er en melding som er et svar og ikke originalt (fra deg)
+    if (!isSenderYou) {
+      return body
+        .replace(/>.*$/gs, "") // Fjerner alt etter første forekomst av >
+        .trim();
+    }
+    // Hvis det er fra deg, beholder vi alt
+    return body;
+  };
+
+  const formatDate = (date) => {
+    if (date) {
+      const newDate = new Date(date);
+      return newDate.toLocaleDateString("nb-NO", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+    return null;
+  };
+
+  console.log(filteredMails);
+
   return (
     <section>
       <h2 className="text-xl font-bold mb-4"></h2>
@@ -37,25 +61,25 @@ export default function MailThread({ clientData }) {
               : false;
           return (
             <div
-              style={{ backgroundColor: isSenderYou ? "green" : "red" }}
+              style={{
+                backgroundColor: isSenderYou ? "lightgrey" : "lightblue",
+              }}
               key={mail.id}
               className="border p-4 rounded shadow mb-4"
             >
-              <h3 className="text-lg font-bold">
-                {mail.subject || "Ingen emne"}
+              <h3>
+                <strong>{isSenderYou ? "You" : clientData.name}</strong>
+                {isSenderYou ? null : ` - ${clientData.email}`}
               </h3>
-              <p>
-                <strong>Fra:</strong>{" "}
-                {mail.from?.emailAddress?.address || "Ukjent"}
-              </p>
-              <p>
-                <strong>Til:</strong>{" "}
-                {mail.toRecipients
-                  .map((to) => to.emailAddress.address)
-                  .join(", ") || "Ingen mottakere"}
-              </p>
-              <p>
-                {mail.bodyPreview || "(Ingen forhåndsvisning tilgjengelig)"}
+
+              <p></p>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: cleanMailBody(mail.body.content, isSenderYou),
+                }}
+              />
+              <p className="text-gray-600 text-sm">
+                {formatDate(mail.sentDateTime) || "No time"}
               </p>
             </div>
           );

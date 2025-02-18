@@ -22,7 +22,8 @@ export async function POST(req) {
     const { access_token } = userDoc.data().mailTokens.outlook;
 
     const sendEmailResponse = await fetch(
-      "https://graph.microsoft.com/v1.0/me/sendMail",
+      /* "https://graph.microsoft.com/v1.0/me/sendMail", */
+      "https://graph.microsoft.com/v1.0/me/messages/AQMkADAwATM0MDAAMi04N2RjLWUxZWYtMDACLTAwCgBGAAAD8vy3mT0qAU6mhPRlhIK3LwcAl5O0cZhVdEqWRozCJS5zYQAAAgEJAAAAl5O0cZhVdEqWRozCJS5zYQAAAASxAHEAAAA=/replyAll",
       {
         method: "POST",
         headers: {
@@ -30,11 +31,12 @@ export async function POST(req) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          message: {
+          /* message: {
             subject: subject,
             body: { contentType: "HTML", content: message },
             toRecipients: [{ emailAddress: { address: to } }],
-          },
+          }, */
+          comment: message,
         }),
       }
     );

@@ -15,6 +15,8 @@ export default function MailThread({ clientData }) {
     error: mailError,
   } = useMails(user?.uid, currentProvider);
 
+  console.log(mailData);
+
   if (mailLoading) return <p>Laster e-post...</p>;
   if (mailError) return <p>Feil: {mailError}</p>;
   if (!mailData.length) return <p>Ingen e-poster funnet.</p>;
@@ -28,11 +30,11 @@ export default function MailThread({ clientData }) {
 
   const cleanMailBody = (body, isSenderYou) => {
     // Hvis det er en melding som er et svar og ikke originalt (fra deg)
-    if (!isSenderYou) {
+    /* if (!isSenderYou) {
       return body
         .replace(/>.*$/gs, "") // Fjerner alt etter første forekomst av >
         .trim();
-    }
+    } */
     // Hvis det er fra deg, beholder vi alt
     return body;
   };
@@ -48,7 +50,7 @@ export default function MailThread({ clientData }) {
     return null;
   };
 
-  console.log(filteredMails);
+  console.log(filteredMails, "arr");
 
   return (
     <section>

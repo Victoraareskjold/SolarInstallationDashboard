@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loading from "./Loading";
 
-export default function SendMail({ clientId, clientData }) {
+export default function SendMail({ clientId, clientData, isReply }) {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     to: clientData?.email || "",
@@ -66,7 +66,7 @@ export default function SendMail({ clientId, clientData }) {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...formData, userId: user.uid }),
+          body: JSON.stringify({ ...formData, userId: user.uid, isReply }),
         }
       );
 
@@ -132,7 +132,7 @@ export default function SendMail({ clientId, clientData }) {
           </select>
         </div>
         <button type="submit" className="bg-blue-600 text-white p-2 rounded">
-          Send e-mail
+          {isReply ? "Reply" : "Send"}
         </button>
       </form>
       {status && <p className="mt-4 text-gray-700">{status}</p>}

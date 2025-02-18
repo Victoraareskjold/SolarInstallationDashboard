@@ -1,12 +1,4 @@
-"use client";
-import { useAuth } from "@/context/AuthContext";
-import { useGetMailProvider } from "@/hooks/useGetMailProvider";
-import useMails from "@/hooks/useMails";
-
 export default function MailThread({ clientData, filteredMails }) {
-  const { user } = useAuth();
-
-
   const cleanMailBody = (body, isSenderYou) => {
     // Hvis det er en melding som er et svar og ikke originalt (fra deg)
     /* if (!isSenderYou) {

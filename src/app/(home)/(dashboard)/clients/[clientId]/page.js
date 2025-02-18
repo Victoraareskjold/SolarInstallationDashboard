@@ -55,14 +55,25 @@ export default function ClientView() {
   if (mailError) return <p>Feil: {mailError}</p>;
   if (!mailData.length) return <p>Ingen e-poster funnet.</p>;
 
+  console.log(mailData);
+
+  const normalizeEmail = (email) => {
+    if (typeof email !== "string") return null;
+    return email.replace(/\./g, "");
+  };
+
   const filteredMails = mailData.filter(
     (mail) =>
       mail.toRecipients.some(
-        (to) => to.emailAddress.address === clientData?.email
-      ) || mail.from?.emailAddress?.address === clientData?.email
+        (to) =>
+          normalizeEmail(to.emailAddress.address) ==
+          normalizeEmail(clientData?.email)
+      ) ||
+      normalizeEmail(mail.from?.emailAddress?.address) ==
+        normalizeEmail(clientData?.email)
   );
 
-  const lastMailId = filteredMails[0].id;
+  const lastMailId = filteredMails[0]?.id || null;
 
   return (
     <main className="defaultContainer">

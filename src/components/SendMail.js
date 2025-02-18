@@ -105,7 +105,6 @@ export default function SendMail({
           placeholder="To (e-mail)"
           value={formData.to}
           onChange={handleChange}
-          required
           hidden
           className="w-full p-2 border rounded"
         />
@@ -115,7 +114,6 @@ export default function SendMail({
           placeholder="subject"
           value={formData.subject}
           onChange={handleChange}
-          required
           hidden
           className="w-full p-2 border rounded"
         />

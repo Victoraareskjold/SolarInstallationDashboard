@@ -3,7 +3,8 @@ import { doc, getDoc, setDoc, collection } from "firebase/firestore";
 
 export async function POST(req) {
   try {
-    const { userId, to, subject, message } = await req.json();
+    const { userId, to, subject, message, isReply, lastMailId } =
+      await req.json();
 
     if (!userId || !to || !subject || !message) {
       return Response.json({ error: "Manglende data" }, { status: 400 });
@@ -23,7 +24,7 @@ export async function POST(req) {
 
     const sendEmailResponse = await fetch(
       /* "https://graph.microsoft.com/v1.0/me/sendMail", */
-      "https://graph.microsoft.com/v1.0/me/messages/AQMkADAwATM0MDAAMi04N2RjLWUxZWYtMDACLTAwCgBGAAAD8vy3mT0qAU6mhPRlhIK3LwcAl5O0cZhVdEqWRozCJS5zYQAAAgEJAAAAl5O0cZhVdEqWRozCJS5zYQAAAASxAHEAAAA=/replyAll",
+      `https://graph.microsoft.com/v1.0/me/messages/${lastMailId}/replyAll`,
       {
         method: "POST",
         headers: {

@@ -3,30 +3,9 @@ import { useAuth } from "@/context/AuthContext";
 import { useGetMailProvider } from "@/hooks/useGetMailProvider";
 import useMails from "@/hooks/useMails";
 
-export default function MailThread({ clientData }) {
+export default function MailThread({ clientData, filteredMails }) {
   const { user } = useAuth();
 
-  const { provider: currentProvider, loading: providerLoading } =
-    useGetMailProvider(user?.uid);
-
-  const {
-    mails: mailData,
-    loading: mailLoading,
-    error: mailError,
-  } = useMails(user?.uid, currentProvider);
-
-  console.log(mailData);
-
-  if (mailLoading) return <p>Laster e-post...</p>;
-  if (mailError) return <p>Feil: {mailError}</p>;
-  if (!mailData.length) return <p>Ingen e-poster funnet.</p>;
-
-  const filteredMails = mailData.filter(
-    (mail) =>
-      mail.toRecipients.some(
-        (to) => to.emailAddress.address === clientData?.email
-      ) || mail.from?.emailAddress?.address === clientData?.email
-  );
 
   const cleanMailBody = (body, isSenderYou) => {
     // Hvis det er en melding som er et svar og ikke originalt (fra deg)
@@ -50,7 +29,7 @@ export default function MailThread({ clientData }) {
     return null;
   };
 
-  console.log(filteredMails, "arr");
+  console.log(filteredMails);
 
   return (
     <section>

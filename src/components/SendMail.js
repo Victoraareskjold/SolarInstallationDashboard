@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loading from "./Loading";
 
-export default function SendMail({ clientId, clientData, isReply }) {
+export default function SendMail({
+  clientId,
+  clientData,
+  isReply,
+  lastMailId,
+}) {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     to: clientData?.email || "",
@@ -66,7 +71,12 @@ export default function SendMail({ clientId, clientData, isReply }) {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...formData, userId: user.uid, isReply }),
+          body: JSON.stringify({
+            ...formData,
+            userId: user.uid,
+            isReply,
+            lastMailId,
+          }),
         }
       );
 

@@ -6,14 +6,74 @@ import { useFirestoreDoc } from "@/hooks/useFirestoreDoc";
 import Link from "next/link";
 import MailThread from "@/components/MailThread";
 import SendMail from "@/components/SendMail";
-import { useState } from "react";
+import Loading from "@/components/Loading";
+import { useState, useEffect } from "react";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { useGetMailProvider } from "@/hooks/useGetMailProvider";
+import useMails from "@/hooks/useMails";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ClientView() {
   const { clientId } = useParams();
-
+  const { user } = useAuth();
   const { data: clientData, error } = useFirestoreDoc(db, "clients", clientId);
-
+  const [isReply, setIsReply] = useState(null);
   const hasRoofData = clientData ? true : false;
+
+  const { provider: currentProvider, loading: providerLoading } =
+    useGetMailProvider(user?.uid);
+
+  const {
+    mails: mailData,
+    loading: mailLoading,
+    error: mailError,
+  } = useMails(user?.uid, currentProvider);
+
+  useEffect(() => {
+    if (clientData) {
+      const checkReply = async () => {
+        const emailsRef = collection(db, "emails");
+        const q = query(emailsRef, where("to", "==", clientData.email));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          setIsReply(true);
+        } else {
+          setIsReply(false);
+        }
+      };
+
+      checkReply();
+    }
+  }, [clientData]);
+
+  if (!clientData) {
+    return <Loading />;
+  }
+
+  if (mailLoading) return <p>Laster e-post...</p>;
+  if (mailError) return <p>Feil: {mailError}</p>;
+  if (!mailData.length) return <p>Ingen e-poster funnet.</p>;
+
+  console.log(mailData);
+
+  const normalizeEmail = (email) => {
+    if (typeof email !== "string") return null;
+    return email.replace(/\./g, "");
+  };
+
+  const filteredMails = mailData.filter(
+    (mail) =>
+      mail.toRecipients.some(
+        (to) =>
+          normalizeEmail(to.emailAddress.address) ==
+          normalizeEmail(clientData?.email)
+      ) ||
+      normalizeEmail(mail.from?.emailAddress?.address) ==
+        normalizeEmail(clientData?.email)
+  );
+
+  const lastMailId = filteredMails[0]?.id || null;
 
   return (
     <main className="defaultContainer">
@@ -33,8 +93,17 @@ export default function ClientView() {
         {hasRoofData ? "View Estimate" : "Create Estimate"}
       </Link>
 
-      <MailThread clientId={clientId} clientData={clientData} />
-      <SendMail clientId={clientId} clientData={clientData} />
+      <MailThread
+        clientId={clientId}
+        clientData={clientData}
+        filteredMails={filteredMails}
+      />
+      <SendMail
+        clientId={clientId}
+        clientData={clientData}
+        isReply={isReply}
+        lastMailId={lastMailId}
+      />
     </main>
   );
 }

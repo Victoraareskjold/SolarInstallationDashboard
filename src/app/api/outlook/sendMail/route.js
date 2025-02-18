@@ -3,7 +3,8 @@ import { doc, getDoc, setDoc, collection } from "firebase/firestore";
 
 export async function POST(req) {
   try {
-    const { userId, to, subject, message } = await req.json();
+    const { userId, to, subject, message, isReply, lastMailId } =
+      await req.json();
 
     if (!userId || !to || !subject || !message) {
       return Response.json({ error: "Manglende data" }, { status: 400 });
@@ -21,23 +22,43 @@ export async function POST(req) {
 
     const { access_token } = userDoc.data().mailTokens.outlook;
 
-    const sendEmailResponse = await fetch(
-      "https://graph.microsoft.com/v1.0/me/sendMail",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: {
-            subject: subject,
-            body: { contentType: "HTML", content: message },
-            toRecipients: [{ emailAddress: { address: to } }],
+    let sendEmailResponse;
+
+    if (isReply) {
+      console.log("replying");
+      sendEmailResponse = await fetch(
+        `https://graph.microsoft.com/v1.0/me/messages/${lastMailId}/replyAll`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            "Content-Type": "application/json",
           },
-        }),
-      }
-    );
+          body: JSON.stringify({
+            comment: message,
+          }),
+        }
+      );
+    } else {
+      console.log("Starting thread");
+      sendEmailResponse = await fetch(
+        "https://graph.microsoft.com/v1.0/me/sendMail",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: {
+              subject: subject,
+              body: { contentType: "HTML", content: message },
+              toRecipients: [{ emailAddress: { address: to } }],
+            },
+          }),
+        }
+      );
+    }
 
     if (!sendEmailResponse.ok) {
       throw new Error("Kunne ikke sende e-post via Outlook");

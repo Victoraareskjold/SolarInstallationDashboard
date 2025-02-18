@@ -13,6 +13,7 @@ export default function ClientCard({ client }) {
     >
       <h2>
         <strong>{client?.name}</strong>
+        <p>{client?.address || "Missing address"}</p>
       </h2>
     </Link>
   );

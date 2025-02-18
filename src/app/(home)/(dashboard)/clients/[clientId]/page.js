@@ -51,9 +51,7 @@ export default function ClientView() {
     return <Loading />;
   }
 
-  if (mailLoading) return <p>Laster e-post...</p>;
   if (mailError) return <p>Feil: {mailError}</p>;
-  if (!mailData.length) return <p>Ingen e-poster funnet.</p>;
 
   console.log(mailData);
 

@@ -1,13 +1,23 @@
 export default function MailThread({ clientData, filteredMails }) {
-  const cleanMailBody = (body, isSenderYou) => {
-    // Hvis det er en melding som er et svar og ikke originalt (fra deg)
-    /* if (!isSenderYou) {
-      return body
-        .replace(/>.*$/gs, "") // Fjerner alt etter første forekomst av >
-        .trim();
-    } */
-    // Hvis det er fra deg, beholder vi alt
-    return body;
+  const cleanMailBody = (body) => {
+    // Fjern HTML-tagger, men behold linjeskift
+    let cleanText = body
+      .replace(/<br\s*\/?>/gi, "\n") // Bytt ut <br> med newline
+      .replace(/<[^>]+>/g, ""); // Fjern alle HTML-tagger
+
+    // Fjern metadata-linjer ("From:", "Sent:", "To:", "Subject:")
+    cleanText = cleanText.replace(/^(From|Sent|To|Subject):.*$/gm, "").trim();
+
+    // Fjern alt etter første "On [date], [sender] wrote:"
+    cleanText = cleanText.replace(/On .*? wrote:([\s\S]*)/i, "").trim();
+
+    // Fjern alt etter første <hr> eller lignende separatorer
+    cleanText = cleanText.split(/-{2,}|\n?_{2,}\n?/)[0];
+
+    // Fjern tomme linjer og overflødig mellomrom
+    cleanText = cleanText.replace(/\n{2,}/g, "\n").trim();
+
+    return cleanText;
   };
 
   const formatDate = (date) => {

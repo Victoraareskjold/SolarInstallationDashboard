@@ -9,7 +9,7 @@ export default function ClientCard({ client }) {
   return (
     <Link
       href={`/clients/${client.id}`}
-      className="block mt-4 bg-white p-2 w-full rounded-md shadow-md"
+      className="block bg-white p-2 w-full rounded-md shadow-md"
     >
       <h2>
         <strong>{client?.name}</strong>

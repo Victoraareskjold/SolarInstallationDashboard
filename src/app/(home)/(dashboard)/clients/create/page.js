@@ -131,7 +131,7 @@ export default function CreateClientPage() {
         </div>
         <BackButton />
         <button onClick={handleToggleModal}>
-          {isModalOpen ? "Close modal" : "Open modal"}
+          {isModalOpen ? "Close pvmap" : "Open pvmap"}
         </button>
         <section className="relative flex flex-col">
           <ImageUploadComponent setImageUrl={setImageUrl} />
@@ -197,7 +197,7 @@ export default function CreateClientPage() {
             className="border p-2"
           />
 
-          {solarData?.checkedRoofData?.length > 0 && (
+          {solarData?.length > 0 && (
             <div className="flex flex-col gap-3 w-full">
               <h2 className="font-bold mb-2">Takflater</h2>
               {solarData.checkedRoofData.map((roof, index) => (

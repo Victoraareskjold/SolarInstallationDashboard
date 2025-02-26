@@ -17,7 +17,7 @@ export default function Navbar() {
           route2="/clients/create"
           name2="Create new client"
         />
-        <DropdownMenu />
+        <DropdownMenu route="/priceCalculator" name="Price Calculator" />
       </ul>
 
       <ul>

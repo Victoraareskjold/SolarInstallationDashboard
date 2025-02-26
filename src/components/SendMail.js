@@ -14,7 +14,7 @@ export default function SendMail({
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     to: clientData?.email || "",
-    subject: clientId || "",
+    subject: "",
     message: "",
   });
   const [status, setStatus] = useState("");
@@ -36,27 +36,38 @@ export default function SendMail({
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const [selectedTemplate, setSelectedTemplate] = useState("");
-
   const templates = [
-    { id: 1, name: "Påminnelse", content: "Hei, husk avtalen vår..." },
+    {
+      id: 1,
+      name: "Påminnelse",
+      subject: "Vi vil minne deg på",
+      content: "Hei, husk avtalen vår...",
+    },
     {
       id: 2,
       name: "Takk for forespørsel",
+      subject: "Takk subject",
       content: "Takk for din forespørsel!",
     },
     {
       id: 3,
       name: "Send estimat",
+      subject: "Her er ditt estimat",
       content: `Vi har et tilbud for deg... Sjek denne linken: <a href="https://www.lynelektrosol.no/estimat/${clientId}">Se estimat<a/>`,
     },
   ];
 
-  const handleTemplateSelect = (content) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      message: content,
-    }));
+  const handleTemplateSelect = (selectedTemplateContent) => {
+    const selectedTemplate = templates.find(
+      (template) => template.content === selectedTemplateContent
+    );
+    if (selectedTemplate) {
+      setFormData((prevData) => ({
+        ...prevData,
+        subject: selectedTemplate.subject,
+        message: selectedTemplate.content,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -83,6 +94,10 @@ export default function SendMail({
       const data = await response.json();
       if (response.ok) {
         setStatus("E-post sendt!");
+        setFormData((prevData) => ({
+          ...prevData,
+          message: "",
+        }));
         alert("Email sent!");
       } else {
         setStatus(`Feil: ${data.error}`);

@@ -1,5 +1,5 @@
 export const allFields = {
-  snekker: ["Taktekke", "Snekker kostnad", "Påslag elektriker", "Total"],
+  snekker: ["Taktekke", "Snekker kostnad", "Påslag elektriker %", "Total"],
   "Leverandør Nordic Solergy": [
     "Panel kostnad",
     "Feste kostnad",

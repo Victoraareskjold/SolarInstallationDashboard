@@ -17,15 +17,18 @@ export default function PriceCalculator() {
   } = useFirestoreDoc(db, "organizations", organizationId);
 
   const [data, setData] = useState({});
-  const [currentSelectedRoof, setcurrentSelectedRoof] = useState(
-    snekkerDropdown[0]
-  );
 
+  //DROPDOWNS
+  const [selectedRoof, setSelectedRoof] = useState(snekkerDropdown[0]);
+
+  //TOTALS
   const [snekkerTotal, setSnekkerTotal] = useState(0);
+  const [leverandørTotal, setLeverandørTotal] = useState(0);
   const [elektrikerTotal, setElektrikerTotal] = useState(0);
 
   const [totals, setTotals] = useState({
     snekker: 0,
+    leverandør: 0,
     elektriker: 0,
   });
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -34,16 +37,15 @@ export default function PriceCalculator() {
     setTotals({
       snekker: snekkerTotal,
       elektriker: elektrikerTotal,
+      leverandør: leverandørTotal,
     });
-  }, [snekkerTotal, elektrikerTotal]);
+  }, [snekkerTotal, elektrikerTotal, leverandørTotal]);
 
   useEffect(() => {
     setData(orgData?.priceCalculator || {});
   }, [orgData]);
 
-  useCalculatePrices({ setTotals, refreshTrigger, currentSelectedRoof });
-
-  console.log(totals);
+  useCalculatePrices({ setTotals, refreshTrigger, selectedRoof });
 
   const handleUpdate = async (category, key, value) => {
     if (category === "snekker" && key === "Taktekke") {
@@ -53,7 +55,7 @@ export default function PriceCalculator() {
           ...data[category],
           [key]: {
             ...data[category]?.[key],
-            [currentSelectedRoof]: value,
+            [selectedRoof]: value,
           },
         },
       };
@@ -97,8 +99,8 @@ export default function PriceCalculator() {
                   <div key={field} className="mb-2">
                     <label className="block font-regular">{field}</label>
                     <select
-                      value={currentSelectedRoof}
-                      onChange={(e) => setcurrentSelectedRoof(e.target.value)}
+                      value={selectedRoof}
+                      onChange={(e) => setSelectedRoof(e.target.value)}
                       className="border p-2 w-full"
                     >
                       {snekkerDropdown.map((option, index) => (
@@ -109,11 +111,11 @@ export default function PriceCalculator() {
                     </select>
                     <div className="mt-3">
                       <label className="block font-regular">
-                        {field} ({currentSelectedRoof})
+                        {field} ({selectedRoof})
                       </label>
                       <input
                         type="number"
-                        value={value?.[currentSelectedRoof] ?? ""}
+                        value={value?.[selectedRoof] ?? ""}
                         placeholder={0}
                         min={0}
                         onChange={(e) =>

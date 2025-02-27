@@ -6,7 +6,7 @@ import { useEffect } from "react";
 export const useCalculatePrices = ({
   setTotals,
   refreshTrigger,
-  currentSelectedRoof,
+  selectedRoof,
 }) => {
   const { organizationId } = useAuth();
 
@@ -23,13 +23,24 @@ export const useCalculatePrices = ({
         const newTotals = {
           snekker: 0,
           elektriker: 0,
+          leverandør: 0,
         };
 
-        newTotals.snekker += priceData?.snekker?.["Snekker kostnad"] ?? 0;
-        newTotals.snekker += priceData?.snekker?.["Påslag elektriker"] ?? 0;
-        newTotals.snekker +=
-          priceData?.snekker?.["Taktekke"]?.[currentSelectedRoof] ?? 0;
+        //SNEKKER
+        const taktekkePris =
+          priceData?.snekker?.["Taktekke"]?.[selectedRoof] ?? 0;
+        const snekkerKostnad = priceData?.snekker?.["Snekker kostnad"] ?? 0;
+        const elektrikerPåslagProsent =
+          priceData?.snekker?.["Påslag elektriker %"] ?? 0;
 
+        const snekkerSubtotal = taktekkePris + snekkerKostnad;
+        const fratrekk = (snekkerSubtotal * elektrikerPåslagProsent) / 100;
+
+        newTotals.snekker = snekkerSubtotal - fratrekk;
+
+        //LEVERANDØR
+
+        //ELEKTRIKER
         newTotals.elektriker +=
           priceData?.elektriker?.["Elektriker arbeid"] ?? 0;
         newTotals.elektriker +=
@@ -42,7 +53,7 @@ export const useCalculatePrices = ({
     };
 
     fetchPriceData();
-  }, [organizationId, setTotals, refreshTrigger, currentSelectedRoof]);
+  }, [organizationId, setTotals, refreshTrigger, selectedRoof]);
 
   return null;
 };

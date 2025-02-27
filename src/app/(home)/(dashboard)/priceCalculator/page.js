@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import Loading from "@/components/Loading";
 import { allFields, snekkerDropdown } from "@/constants/priceFields";
+import { useCalculatePrices } from "@/hooks/useCalculatePrices";
 
 export default function PriceCalculator() {
   const { organizationId } = useAuth();
@@ -16,50 +17,66 @@ export default function PriceCalculator() {
   } = useFirestoreDoc(db, "organizations", organizationId);
 
   const [data, setData] = useState({});
-  const [currentSelected, setCurrentSelected] = useState(snekkerDropdown[0]);
+  const [currentSelectedRoof, setcurrentSelectedRoof] = useState(
+    snekkerDropdown[0]
+  );
 
   const [snekkerTotal, setSnekkerTotal] = useState(0);
+  const [elektrikerTotal, setElektrikerTotal] = useState(0);
+
+  const [totals, setTotals] = useState({
+    snekker: 0,
+    elektriker: 0,
+  });
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  useEffect(() => {
+    setTotals({
+      snekker: snekkerTotal,
+      elektriker: elektrikerTotal,
+    });
+  }, [snekkerTotal, elektrikerTotal]);
 
   useEffect(() => {
     setData(orgData?.priceCalculator || {});
   }, [orgData]);
 
+  useCalculatePrices({ setTotals, refreshTrigger, currentSelectedRoof });
+
+  console.log(totals);
+
   const handleUpdate = async (category, key, value) => {
-    if (category === "Snekker" && key === "Taktekke") {
+    if (category === "snekker" && key === "Taktekke") {
       const updatedData = {
         ...data,
         [category]: {
           ...data[category],
           [key]: {
             ...data[category]?.[key],
-            [currentSelected]: value, // Oppdater kun den valgte taktypen
+            [currentSelectedRoof]: value,
           },
         },
       };
       setData(updatedData);
 
-      // Oppdater i databasen
       await updateDocData({
         priceCalculator: updatedData,
       });
     } else {
-      // Hvis det er en generell verdi (som Snekker kostnad eller Påslag elektriker)
       const updatedData = {
         ...data,
         [category]: {
           ...data[category],
-          [key]: value, // Oppdater den generelle verdien
+          [key]: value,
         },
       };
       setData(updatedData);
 
-      // Oppdater i databasen
-      if (key != "Total") {
-        await updateDocData({
-          priceCalculator: updatedData,
-        });
-      }
+      await updateDocData({
+        priceCalculator: updatedData,
+      });
     }
+    setRefreshTrigger((prev) => prev + 1);
   };
 
   if (loading) {
@@ -75,14 +92,13 @@ export default function PriceCalculator() {
             {fields.map((field) => {
               let value = data[categoryKey]?.[field] ?? 0;
 
-              // Hvis det er for Taktekke (som har flere taktyper)
-              if (categoryKey === "Snekker" && field === "Taktekke") {
+              if (categoryKey === "snekker" && field === "Taktekke") {
                 return (
                   <div key={field} className="mb-2">
                     <label className="block font-regular">{field}</label>
                     <select
-                      value={currentSelected}
-                      onChange={(e) => setCurrentSelected(e.target.value)}
+                      value={currentSelectedRoof}
+                      onChange={(e) => setcurrentSelectedRoof(e.target.value)}
                       className="border p-2 w-full"
                     >
                       {snekkerDropdown.map((option, index) => (
@@ -93,11 +109,11 @@ export default function PriceCalculator() {
                     </select>
                     <div className="mt-3">
                       <label className="block font-regular">
-                        {field} ({currentSelected})
+                        {field} ({currentSelectedRoof})
                       </label>
                       <input
                         type="number"
-                        value={value?.[currentSelected] ?? ""}
+                        value={value?.[currentSelectedRoof] ?? ""}
                         placeholder={0}
                         min={0}
                         onChange={(e) =>
@@ -114,7 +130,21 @@ export default function PriceCalculator() {
                 );
               }
 
-              // Generelle felter som Snekker kostnad, Påslag elektriker, etc.
+              if (field === "Total") {
+                return (
+                  <div key={field} className="mb-2">
+                    <label className="block font-semibold">{field}</label>
+                    <input
+                      type="number"
+                      value={totals[categoryKey] ?? 0}
+                      placeholder={0}
+                      readOnly
+                      className="border p-2 w-full"
+                    />
+                  </div>
+                );
+              }
+
               if (typeof value === "number") {
                 return (
                   <div key={field} className="mb-2">
@@ -136,7 +166,7 @@ export default function PriceCalculator() {
               if (typeof value === "string") {
                 return (
                   <div key={field} className="mb-2">
-                    <label className="block font-semibold">{field}</label>
+                    <label className="block font-regular">{field}</label>
                     <input
                       type="text"
                       value={value}

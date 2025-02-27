@@ -1,5 +1,5 @@
 export const allFields = {
-  Snekker: ["Taktekke", "Snekker kostnad", "Påslag elektriker", "Total"],
+  snekker: ["Taktekke", "Snekker kostnad", "Påslag elektriker", "Total"],
   "Leverandør Nordic Solergy": [
     "Panel kostnad",
     "Feste kostnad",
@@ -8,7 +8,7 @@ export const allFields = {
     "Påslag elektriker",
     "Total",
   ],
-  Elektriker: [
+  elektriker: [
     "Elektriker arbeid",
     "Tilleggskostnader",
     "Påslag elektriker",

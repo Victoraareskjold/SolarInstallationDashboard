@@ -1,11 +1,14 @@
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
-export const useCalculatePrices = ({ panelCount }) => {
+export const useCalculatePrices = ({
+  setTotals,
+  refreshTrigger,
+  currentSelectedRoof,
+}) => {
   const { organizationId } = useAuth();
-  const [totalCost, setTotalCost] = useState(0);
 
   useEffect(() => {
     if (!organizationId) return;
@@ -17,34 +20,29 @@ export const useCalculatePrices = ({ panelCount }) => {
       if (orgSnap.exists()) {
         const priceData = orgSnap.data().priceCalculator || {};
 
-        let costSum = 0;
+        const newTotals = {
+          snekker: 0,
+          elektriker: 0,
+        };
 
-        costSum += priceData?.Snekker?.["Snekker kostnad"] ?? 0;
+        newTotals.snekker += priceData?.snekker?.["Snekker kostnad"] ?? 0;
+        newTotals.snekker += priceData?.snekker?.["Påslag elektriker"] ?? 0;
+        newTotals.snekker +=
+          priceData?.snekker?.["Taktekke"]?.[currentSelectedRoof] ?? 0;
 
-        costSum +=
-          priceData?.["Leverandør Nordic Solergy"]?.["Panel kostnad"] ?? 0;
-        costSum +=
-          priceData?.["Leverandør Nordic Solergy"]?.["Feste kostnad"] ?? 0;
-        costSum +=
-          priceData?.["Leverandør Nordic Solergy"]?.["Invertert Kostnad"] ?? 0;
-        costSum +=
-          priceData?.["Leverandør Nordic Solergy"]?.["Batteri kostnad"] ?? 0;
+        newTotals.elektriker +=
+          priceData?.elektriker?.["Elektriker arbeid"] ?? 0;
+        newTotals.elektriker +=
+          priceData?.elektriker?.["Tilleggskostnader"] ?? 0;
+        newTotals.elektriker +=
+          priceData?.elektriker?.["Påslag elektriker"] ?? 0;
 
-        costSum += priceData?.Elektriker?.["Elektriker arbeid"] ?? 0;
-        costSum += priceData?.Elektriker?.["Tilleggskostnader"] ?? 0;
-
-        costSum += priceData?.["Total kostnad"]?.["Frakt"] ?? 0;
-        costSum += priceData?.["Total kostnad"]?.["Enova støtte"] ?? 0;
-
-        costSum += priceData?.Snekker?.["Påslag elektriker"] ?? 0;
-        costSum += priceData?.Elektriker?.["Påslag elektriker"] ?? 0;
-
-        setTotalCost(costSum);
+        setTotals(newTotals);
       }
     };
 
     fetchPriceData();
-  }, [organizationId, panelCount]);
+  }, [organizationId, setTotals, refreshTrigger, currentSelectedRoof]);
 
-  return { totalCost };
+  return null;
 };

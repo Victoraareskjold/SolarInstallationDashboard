@@ -21,25 +21,13 @@ export default function PriceCalculator() {
   //DROPDOWNS
   const [selectedRoof, setSelectedRoof] = useState(snekkerDropdown[0]);
 
-  //TOTALS
-  const [snekkerTotal, setSnekkerTotal] = useState(0);
-  const [leverandørTotal, setLeverandørTotal] = useState(0);
-  const [elektrikerTotal, setElektrikerTotal] = useState(0);
-
   const [totals, setTotals] = useState({
     snekker: 0,
     leverandør: 0,
     elektriker: 0,
+    total: 0,
   });
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  useEffect(() => {
-    setTotals({
-      snekker: snekkerTotal,
-      elektriker: elektrikerTotal,
-      leverandør: leverandørTotal,
-    });
-  }, [snekkerTotal, elektrikerTotal, leverandørTotal]);
 
   useEffect(() => {
     setData(orgData?.priceCalculator || {});
@@ -84,6 +72,8 @@ export default function PriceCalculator() {
   if (loading) {
     return <Loading />;
   }
+
+  console.log(totals);
 
   return (
     <main className="defaultContainer">

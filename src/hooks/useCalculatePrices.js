@@ -24,6 +24,7 @@ export const useCalculatePrices = ({
           snekker: 0,
           elektriker: 0,
           leverandør: 0,
+          total: 0,
         };
 
         //SNEKKER
@@ -47,6 +48,11 @@ export const useCalculatePrices = ({
           priceData?.elektriker?.["Tilleggskostnader"] ?? 0;
         newTotals.elektriker +=
           priceData?.elektriker?.["Påslag elektriker"] ?? 0;
+
+        //TOTAL KOSTNAD
+        /* newTotals.total = Object.entries(newTotals)
+          .filter(([key]) => key != "total")
+          .reduce((sum, [, value]) => sum + value, 0); */
 
         setTotals(newTotals);
       }

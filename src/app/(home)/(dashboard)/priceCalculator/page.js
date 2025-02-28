@@ -6,9 +6,8 @@ import { useState, useEffect } from "react";
 import Loading from "@/components/Loading";
 import {
   allFields,
-  roofTypes,
-  roofFields,
-  snekkerDropdown,
+  priceFields,
+  priceCategories,
 } from "@/constants/priceFields";
 import { useCalculatePrices } from "@/hooks/useCalculatePrices";
 import PriceDisplay from "@/components/calculator/PriceDisplay";
@@ -26,7 +25,9 @@ export default function PriceCalculator() {
   const [data, setData] = useState({});
 
   //DROPDOWNS
-  const [selectedRoof, setSelectedRoof] = useState(snekkerDropdown[0]);
+  const [selectedRoof, setSelectedRoof] = useState(
+    Object.keys(priceFields["Ulike taktekker"])[0]
+  );
 
   const [totals, setTotals] = useState({
     snekker: 0,
@@ -42,37 +43,24 @@ export default function PriceCalculator() {
 
   useCalculatePrices({ setTotals, refreshTrigger, selectedRoof });
 
-  const handleUpdate = async (category, key, value) => {
-    if (category === "snekker" && key === "Taktekke") {
-      const updatedData = {
-        ...data,
-        [category]: {
-          ...data[category],
-          [key]: {
-            ...data[category]?.[key],
-            [selectedRoof]: value,
-          },
+  const handleUpdate = async (category, taktype, field, value) => {
+    const updatedData = {
+      ...data,
+      [category]: {
+        ...data[category],
+        [taktype]: {
+          ...data[category]?.[taktype],
+          [field]: value,
         },
-      };
-      setData(updatedData);
+      },
+    };
 
-      await updateDocData({
-        priceCalculator: updatedData,
-      });
-    } else {
-      const updatedData = {
-        ...data,
-        [category]: {
-          ...data[category],
-          [key]: value,
-        },
-      };
-      setData(updatedData);
+    setData(updatedData);
 
-      await updateDocData({
-        priceCalculator: updatedData,
-      });
-    }
+    await updateDocData({
+      priceCalculator: updatedData,
+    });
+
     setRefreshTrigger((prev) => prev + 1);
   };
 
@@ -85,16 +73,15 @@ export default function PriceCalculator() {
       <PriceDisplay
         data={data}
         allFields={allFields}
+        priceFields={priceFields}
         setSelectedRoof={setSelectedRoof}
         selectedRoof={selectedRoof}
-        snekkerDropdown={snekkerDropdown}
         totals={totals}
-        handleUpdate={handleUpdate}
       />
       <PriceInputs
         data={data}
-        roofTypes={roofTypes}
-        roofFields={roofFields}
+        priceFields={priceFields}
+        priceCategories={priceCategories}
         handleUpdate={handleUpdate}
       />
     </main>

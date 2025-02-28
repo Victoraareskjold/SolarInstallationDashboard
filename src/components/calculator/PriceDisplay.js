@@ -1,9 +1,9 @@
 export default function PriceDisplay({
   data,
   allFields,
+  priceFields,
   setSelectedRoof,
   selectedRoof,
-  snekkerDropdown,
   totals,
 }) {
   return (
@@ -23,11 +23,13 @@ export default function PriceDisplay({
                     onChange={(e) => setSelectedRoof(e.target.value)}
                     className="border p-2 w-full"
                   >
-                    {snekkerDropdown.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
+                    {Object.keys(priceFields["Ulike taktekker"]).map(
+                      (roofName, index) => (
+                        <option key={index} value={roofName}>
+                          {roofName}
+                        </option>
+                      )
+                    )}
                   </select>
                 </div>
               );

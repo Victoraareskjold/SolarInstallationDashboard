@@ -36,6 +36,26 @@ export const allFields = {
   ],
 };
 
+export const roofFields = [
+  "Snekker kostnad pr. panel",
+  "Påslag elektriker",
+  "Påslag i Kr (pr. panel)",
+  "Total eks. mva",
+  "Total inkl. mva",
+];
+
+export const roofTypes = {
+  "Enkeltkrummet takstein": {},
+  "Glassert takstein": {},
+  "Flat takstein": {},
+  "Dobbelkrummet takstein": {},
+  Shingel: {},
+  "Trapes plater": {},
+  Flattak: {},
+  Bølgeblikk: {},
+  Decra: {},
+};
+
 export const snekkerDropdown = [
   "Enkeltkrummet takstein",
   "Dobbelkrummet takstein",

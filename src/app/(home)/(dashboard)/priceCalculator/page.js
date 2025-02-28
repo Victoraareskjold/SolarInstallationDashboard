@@ -4,8 +4,15 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import Loading from "@/components/Loading";
-import { allFields, snekkerDropdown } from "@/constants/priceFields";
+import {
+  allFields,
+  roofTypes,
+  roofFields,
+  snekkerDropdown,
+} from "@/constants/priceFields";
 import { useCalculatePrices } from "@/hooks/useCalculatePrices";
+import PriceDisplay from "@/components/calculator/PriceDisplay";
+import PriceInputs from "@/components/calculator/PriceInputs";
 
 export default function PriceCalculator() {
   const { organizationId } = useAuth();
@@ -73,109 +80,23 @@ export default function PriceCalculator() {
     return <Loading />;
   }
 
-  console.log(totals);
-
   return (
     <main className="defaultContainer">
-      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {Object.entries(allFields).map(([categoryKey, fields]) => (
-          <div key={categoryKey}>
-            <h2 className="font-semibold">{categoryKey}</h2>
-            {fields.map((field) => {
-              let value = data[categoryKey]?.[field] ?? 0;
-
-              if (categoryKey === "snekker" && field === "Taktekke") {
-                return (
-                  <div key={field} className="mb-2">
-                    <label className="block font-regular">{field}</label>
-                    <select
-                      value={selectedRoof}
-                      onChange={(e) => setSelectedRoof(e.target.value)}
-                      className="border p-2 w-full"
-                    >
-                      {snekkerDropdown.map((option, index) => (
-                        <option key={index} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="mt-3">
-                      <label className="block font-regular">
-                        {field} ({selectedRoof})
-                      </label>
-                      <input
-                        type="number"
-                        value={value?.[selectedRoof] ?? ""}
-                        placeholder={0}
-                        min={0}
-                        onChange={(e) =>
-                          handleUpdate(
-                            categoryKey,
-                            field,
-                            Number(e.target.value)
-                          )
-                        }
-                        className="border p-2 w-full"
-                      />
-                    </div>
-                  </div>
-                );
-              }
-
-              if (field === "Total") {
-                return (
-                  <div key={field} className="mb-2">
-                    <label className="block font-semibold">{field}</label>
-                    <input
-                      type="number"
-                      value={totals[categoryKey] ?? 0}
-                      placeholder={0}
-                      readOnly
-                      className="border p-2 w-full"
-                    />
-                  </div>
-                );
-              }
-
-              if (typeof value === "number") {
-                return (
-                  <div key={field} className="mb-2">
-                    <label className="block font-regular">{field}</label>
-                    <input
-                      type="number"
-                      value={value === 0 ? "" : value}
-                      placeholder={0}
-                      min={0}
-                      onChange={(e) =>
-                        handleUpdate(categoryKey, field, Number(e.target.value))
-                      }
-                      className="border p-2 w-full"
-                    />
-                  </div>
-                );
-              }
-
-              if (typeof value === "string") {
-                return (
-                  <div key={field} className="mb-2">
-                    <label className="block font-regular">{field}</label>
-                    <input
-                      type="text"
-                      value={value}
-                      onChange={(e) =>
-                        handleUpdate(categoryKey, field, e.target.value)
-                      }
-                      className="border p-2 w-full"
-                    />
-                  </div>
-                );
-              }
-
-              return null;
-            })}
-          </div>
-        ))}
-      </section>
+      <PriceDisplay
+        data={data}
+        allFields={allFields}
+        setSelectedRoof={setSelectedRoof}
+        selectedRoof={selectedRoof}
+        snekkerDropdown={snekkerDropdown}
+        totals={totals}
+        handleUpdate={handleUpdate}
+      />
+      <PriceInputs
+        data={data}
+        roofTypes={roofTypes}
+        roofFields={roofFields}
+        handleUpdate={handleUpdate}
+      />
     </main>
   );
 }

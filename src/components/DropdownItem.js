@@ -5,7 +5,9 @@ export default function DropdownItem({ route, name }) {
 
   return (
     <li className="w-full pl-2">
-      <Link href={route || "/"}>{name || "No name set"}</Link>
+      <Link className="text-nowrap" href={route || "/"}>
+        {name || "No name set"}
+      </Link>
     </li>
   );
 }

@@ -2,6 +2,7 @@
 import ConnectGmail from "@/components/functionalButtons/ConnectGmail";
 import ConnectOutlook from "@/components/functionalButtons/ConnectOutlook";
 import Loading from "@/components/Loading";
+import SignoutButton from "@/components/SignoutButton";
 import UpdateProfile from "@/components/UpdateProfile";
 import { useAuth } from "@/context/AuthContext";
 import { useGetMailProvider } from "@/hooks/useGetMailProvider";
@@ -51,9 +52,12 @@ export default function ProfilePage() {
   return (
     <main className="defaultContainer">
       <UpdateProfile route={""} />
-      <ConnectGmail />
-      <ConnectOutlook />
+      <div className="w-full flex flex-row gap-3">
+        <ConnectGmail />
+        <ConnectOutlook />
+      </div>
       <p>{currentProvider}</p>
+      <SignoutButton />
     </main>
   );
 }

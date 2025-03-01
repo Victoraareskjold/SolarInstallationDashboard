@@ -29,6 +29,12 @@ export default function PriceCalculator() {
     Object.keys(priceFields["Ulike taktekker"])[0]
   );
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleToggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   const [totals, setTotals] = useState({
     snekker: 0,
     leverandør: 0,
@@ -70,14 +76,20 @@ export default function PriceCalculator() {
 
   return (
     <main className="defaultContainer">
-      <PriceDisplay
-        data={data}
-        allFields={allFields}
-        priceFields={priceFields}
-        setSelectedRoof={setSelectedRoof}
-        selectedRoof={selectedRoof}
-        totals={totals}
-      />
+      <button onClick={handleToggleMenu}>
+        {isMenuOpen ? "Close menu" : "View menu"}
+      </button>
+      {isMenuOpen && (
+        <PriceDisplay
+          data={data}
+          allFields={allFields}
+          priceFields={priceFields}
+          setSelectedRoof={setSelectedRoof}
+          selectedRoof={selectedRoof}
+          totals={totals}
+        />
+      )}
+
       <PriceInputs
         data={data}
         priceFields={priceFields}

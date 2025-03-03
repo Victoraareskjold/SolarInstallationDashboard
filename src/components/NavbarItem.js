@@ -1,9 +1,13 @@
 import Link from "next/link";
+import * as LucideIcons from "lucide-react";
 
-export default function NavbarItem({ route, name }) {
+export default function NavbarItem({ route, name, icon, isNavbarOpen }) {
+  const IconComponent = LucideIcons[icon] || LucideIcons.CircleHelp;
+
   return (
-    <li className="w-full">
-      <Link href={route || "/"}>{name || "No name set"}</Link>
-    </li>
+    <Link href={route || "/"} className="flex gap-3 items-center w-full">
+      <IconComponent size={isNavbarOpen ? 20 : 24} />
+      {isNavbarOpen && <p className="font-medium">{name || "No name set"}</p>}
+    </Link>
   );
 }

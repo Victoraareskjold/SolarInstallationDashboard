@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import DropdownItem from "./DropdownItem";
+import * as LucideIcons from "lucide-react";
 
 export default function DropdownMenu({
   route,
@@ -15,24 +16,41 @@ export default function DropdownMenu({
   name3,
   name4,
   name5,
+  icon,
+  isNavbarOpen,
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const IconComponent = LucideIcons[icon] || LucideIcons.CircleHelp;
 
   const handleMouseEnter = () => {
+    //Denne gjør at navbar ikke åpner seg
+    if (!isNavbarOpen) return;
     setIsDropdownOpen(true);
   };
 
   const handleMouseLeave = () => {
+    //Denne gjør at navbar ikke åpner seg
+    if (!isNavbarOpen) return;
     setIsDropdownOpen(false);
   };
+
   return (
     <div
-      className="w-full flex flex-col gap-2 duration-300"
+      className="flex flex-col gap-3 w-full"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       //onClick={() => setIsDropdownOpen(!isDropdownOpen)}
     >
-      <Link href={route || "/"}>{name || "No name set"}</Link>
+      <Link
+        href={route || "/"}
+        className={`flex items-center gap-3 w-full rounded-md`}
+      >
+        {" "}
+        <IconComponent size={isNavbarOpen ? 20 : 24} />
+        {(isNavbarOpen || isDropdownOpen) && (
+          <p className="font-medium">{name || "No name set"}</p>
+        )}
+      </Link>
       {isDropdownOpen && (
         <ul>
           <DropdownItem route={route1} name={name1} />

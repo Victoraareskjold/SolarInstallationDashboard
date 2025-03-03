@@ -4,8 +4,14 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import Loading from "@/components/Loading";
-import { allFields, snekkerDropdown } from "@/constants/priceFields";
+import {
+  allFields,
+  priceFields,
+  priceCategories,
+} from "@/constants/priceFields";
 import { useCalculatePrices } from "@/hooks/useCalculatePrices";
+import PriceDisplay from "@/components/calculator/PriceDisplay";
+import PriceInputs from "@/components/calculator/PriceInputs";
 
 export default function PriceCalculator() {
   const { organizationId } = useAuth();
@@ -19,7 +25,15 @@ export default function PriceCalculator() {
   const [data, setData] = useState({});
 
   //DROPDOWNS
-  const [selectedRoof, setSelectedRoof] = useState(snekkerDropdown[0]);
+  const [selectedRoof, setSelectedRoof] = useState(
+    Object.keys(priceFields["Ulike taktekker"])[0]
+  );
+
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
+
+  const handleToggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   const [totals, setTotals] = useState({
     snekker: 0,
@@ -27,6 +41,8 @@ export default function PriceCalculator() {
     elektriker: 0,
     total: 0,
   });
+  const [panelCount, setPanelCount] = useState(10);
+
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
@@ -35,37 +51,24 @@ export default function PriceCalculator() {
 
   useCalculatePrices({ setTotals, refreshTrigger, selectedRoof });
 
-  const handleUpdate = async (category, key, value) => {
-    if (category === "snekker" && key === "Taktekke") {
-      const updatedData = {
-        ...data,
-        [category]: {
-          ...data[category],
-          [key]: {
-            ...data[category]?.[key],
-            [selectedRoof]: value,
-          },
+  const handleUpdate = async (category, taktype, field, value) => {
+    const updatedData = {
+      ...data,
+      [category]: {
+        ...data[category],
+        [taktype]: {
+          ...data[category]?.[taktype],
+          [field]: value,
         },
-      };
-      setData(updatedData);
+      },
+    };
 
-      await updateDocData({
-        priceCalculator: updatedData,
-      });
-    } else {
-      const updatedData = {
-        ...data,
-        [category]: {
-          ...data[category],
-          [key]: value,
-        },
-      };
-      setData(updatedData);
+    setData(updatedData);
 
-      await updateDocData({
-        priceCalculator: updatedData,
-      });
-    }
+    await updateDocData({
+      priceCalculator: updatedData,
+    });
+
     setRefreshTrigger((prev) => prev + 1);
   };
 
@@ -73,109 +76,29 @@ export default function PriceCalculator() {
     return <Loading />;
   }
 
-  console.log(totals);
-
   return (
     <main className="defaultContainer">
-      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {Object.entries(allFields).map(([categoryKey, fields]) => (
-          <div key={categoryKey}>
-            <h2 className="font-semibold">{categoryKey}</h2>
-            {fields.map((field) => {
-              let value = data[categoryKey]?.[field] ?? 0;
+      <button onClick={handleToggleMenu}>
+        {isMenuOpen ? "Close menu" : "View menu"}
+      </button>
+      {isMenuOpen && (
+        <PriceDisplay
+          data={data}
+          allFields={allFields}
+          priceFields={priceFields}
+          setSelectedRoof={setSelectedRoof}
+          selectedRoof={selectedRoof}
+          totals={totals}
+          panelCount={panelCount}
+        />
+      )}
 
-              if (categoryKey === "snekker" && field === "Taktekke") {
-                return (
-                  <div key={field} className="mb-2">
-                    <label className="block font-regular">{field}</label>
-                    <select
-                      value={selectedRoof}
-                      onChange={(e) => setSelectedRoof(e.target.value)}
-                      className="border p-2 w-full"
-                    >
-                      {snekkerDropdown.map((option, index) => (
-                        <option key={index} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="mt-3">
-                      <label className="block font-regular">
-                        {field} ({selectedRoof})
-                      </label>
-                      <input
-                        type="number"
-                        value={value?.[selectedRoof] ?? ""}
-                        placeholder={0}
-                        min={0}
-                        onChange={(e) =>
-                          handleUpdate(
-                            categoryKey,
-                            field,
-                            Number(e.target.value)
-                          )
-                        }
-                        className="border p-2 w-full"
-                      />
-                    </div>
-                  </div>
-                );
-              }
-
-              if (field === "Total") {
-                return (
-                  <div key={field} className="mb-2">
-                    <label className="block font-semibold">{field}</label>
-                    <input
-                      type="number"
-                      value={totals[categoryKey] ?? 0}
-                      placeholder={0}
-                      readOnly
-                      className="border p-2 w-full"
-                    />
-                  </div>
-                );
-              }
-
-              if (typeof value === "number") {
-                return (
-                  <div key={field} className="mb-2">
-                    <label className="block font-regular">{field}</label>
-                    <input
-                      type="number"
-                      value={value === 0 ? "" : value}
-                      placeholder={0}
-                      min={0}
-                      onChange={(e) =>
-                        handleUpdate(categoryKey, field, Number(e.target.value))
-                      }
-                      className="border p-2 w-full"
-                    />
-                  </div>
-                );
-              }
-
-              if (typeof value === "string") {
-                return (
-                  <div key={field} className="mb-2">
-                    <label className="block font-regular">{field}</label>
-                    <input
-                      type="text"
-                      value={value}
-                      onChange={(e) =>
-                        handleUpdate(categoryKey, field, e.target.value)
-                      }
-                      className="border p-2 w-full"
-                    />
-                  </div>
-                );
-              }
-
-              return null;
-            })}
-          </div>
-        ))}
-      </section>
+      <PriceInputs
+        data={data}
+        priceFields={priceFields}
+        priceCategories={priceCategories}
+        handleUpdate={handleUpdate}
+      />
     </main>
   );
 }

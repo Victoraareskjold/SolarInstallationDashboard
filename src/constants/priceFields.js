@@ -36,7 +36,32 @@ export const allFields = {
   ],
 };
 
-export const snekkerDropdown = [
-  "Enkeltkrummet takstein",
-  "Dobbelkrummet takstein",
+export const priceFields = {
+  "Ulike taktekker": {
+    "Enkeltkrummet takstein": {},
+    "Glassert takstein": {},
+    "Flat takstein": {},
+    "Dobbelkrummet takstein": {},
+    Shingel: {},
+    "Trapes plater": {},
+    Flattak: {},
+    Bølgeblikk: {},
+    Decra: {},
+  },
+  "Arbeid fra elektriker": {
+    "Føring fra tak til inveter": {},
+    "Sikring + opplegg til inverter": {},
+    "Dokumentasjon/søknad til nettselskap": {},
+    "Dobbelkrummet takstein": {},
+    "Stillase* (gjelder for en side)": {},
+    Befaring: {},
+  },
+};
+
+export const priceCategories = [
+  "Snekker kostnad pr. panel",
+  "Påslag elektriker",
+  "Påslag i Kr",
+  "Total eks. mva",
+  "Total inkl. mva",
 ];

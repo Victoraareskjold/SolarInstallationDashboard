@@ -22,7 +22,7 @@ h1 {
 }
 
 .darkButton {
-  background-color: cornflowerblue;
+  background-color: slategray;
   color: white;
   font-size: 16px;
   font-weight: 500;
@@ -33,7 +33,7 @@ h1 {
 }
 
 .smallDarkButton {
-  background-color: cornflowerblue;
+  background-color: slategray;
   color: white;
   font-size: 16px;
   font-weight: 600;

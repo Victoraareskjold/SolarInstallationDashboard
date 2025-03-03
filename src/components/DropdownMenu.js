@@ -33,15 +33,20 @@ export default function DropdownMenu({
     if (!isNavbarOpen) return;
     setIsDropdownOpen(false);
   };
+
   return (
     <div
-      className="flex flex-col gap-2 w-full"
+      className="flex flex-col gap-3 w-full"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       //onClick={() => setIsDropdownOpen(!isDropdownOpen)}
     >
-      <Link href={route || "/"} className="flex items-center gap-3 w-full">
-        <IconComponent size={20} />
+      <Link
+        href={route || "/"}
+        className={`flex items-center gap-3 w-full rounded-md`}
+      >
+        {" "}
+        <IconComponent size={isNavbarOpen ? 20 : 24} />
         {(isNavbarOpen || isDropdownOpen) && (
           <p className="font-medium">{name || "No name set"}</p>
         )}

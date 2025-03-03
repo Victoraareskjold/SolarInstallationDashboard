@@ -1,3 +1,5 @@
+import DisplayInputField from "./DisplayInputField";
+
 export default function PriceDisplay({
   data,
   allFields,
@@ -5,85 +7,84 @@ export default function PriceDisplay({
   setSelectedRoof,
   selectedRoof,
   totals,
+  panelCount,
 }) {
+  // Hent data for valgt taktekke og elektriker
+  const selectedRoofData = data["Ulike taktekker"]?.[selectedRoof] || {};
+  const selectedElectricianData = data["Arbeid fra elektriker"] || {};
+
+  // Snekker
+  const snekkerKostnad = selectedRoofData["Snekker kostnad pr. panel"];
+  const snekkerTotal = panelCount * snekkerKostnad;
+  // legg til påslag elektriker
+  const påslagElektriker = selectedRoofData["Påslag elektriker"];
+  const påslagIKr = selectedRoofData["Påslag i Kr"];
+  const snekkerTotalTotal = snekkerTotal + påslagIKr;
+
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-      {Object.entries(allFields).map(([categoryKey, fields]) => (
-        <div key={categoryKey}>
-          <h2 className="font-semibold">{categoryKey}</h2>
-          {fields.map((field) => {
-            let value = data[categoryKey]?.[field] ?? 0;
+    <main className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      {/* Snekker section */}
+      <section className="flex flex-col gap-2">
+        <h2 className="font-semibold">Snekker</h2>
 
-            if (categoryKey === "snekker" && field === "Taktekke") {
-              return (
-                <div key={field} className="mb-2">
-                  <label className="block font-regular">{field}</label>
-                  <select
-                    value={selectedRoof}
-                    onChange={(e) => setSelectedRoof(e.target.value)}
-                    className="border p-2 w-full"
-                  >
-                    {Object.keys(priceFields["Ulike taktekker"]).map(
-                      (roofName, index) => (
-                        <option key={index} value={roofName}>
-                          {roofName}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
-              );
-            }
-
-            if (field === "Total") {
-              return (
-                <div key={field} className="mb-2">
-                  <label className="block font-semibold">{field}</label>
-                  <input
-                    type="number"
-                    value={totals[categoryKey] ?? 0}
-                    placeholder={0}
-                    readOnly
-                    className="border p-2 w-full"
-                  />
-                </div>
-              );
-            }
-
-            if (typeof value === "number") {
-              return (
-                <div key={field} className="mb-2">
-                  <label className="block font-regular">{field}</label>
-                  <input
-                    type="number"
-                    value={value === 0 ? "" : value}
-                    placeholder={0}
-                    min={0}
-                    readOnly
-                    className="border p-2 w-full"
-                  />
-                </div>
-              );
-            }
-
-            if (typeof value === "string") {
-              return (
-                <div key={field} className="mb-2">
-                  <label className="block font-regular">{field}</label>
-                  <input
-                    type="text"
-                    value={value}
-                    readOnly
-                    className="border p-2 w-full"
-                  />
-                </div>
-              );
-            }
-
-            return null;
-          })}
+        <div className="">
+          <label className="block font-regular">Taktekke</label>
+          <select
+            value={selectedRoof}
+            onChange={(e) => setSelectedRoof(e.target.value)}
+            className="border p-2 w-full"
+          >
+            {Object.keys(priceFields["Ulike taktekker"]).map((roofName) => (
+              <option key={roofName} value={roofName}>
+                {roofName}
+              </option>
+            ))}
+          </select>
         </div>
-      ))}
-    </section>
+
+        <DisplayInputField
+          label={"Snekker kostnad pr. panel"}
+          value={selectedRoofData["Snekker kostnad pr. panel"]}
+        />
+        <DisplayInputField
+          label={"Snekker total kostnad"}
+          value={snekkerTotal || 0}
+        />
+        <DisplayInputField
+          label={"Påslag elektriker"}
+          value={selectedRoofData["Påslag elektriker"]}
+        />
+        <DisplayInputField
+          label={"Påslag i Kr"}
+          value={selectedRoofData["Påslag i Kr"]}
+        />
+        <DisplayInputField
+          label={"Total eks. mva"}
+          value={snekkerTotalTotal || 0}
+        />
+      </section>
+
+      {/* Elektriker section */}
+      <section className="flex flex-col gap-2">
+        <h2 className="font-semibold">Elektriker</h2>
+
+        <DisplayInputField
+          label={"Elektriker arbeid"}
+          value={selectedElectricianData["Elektriker arbeid"]}
+        />
+        <DisplayInputField
+          label={"Tilleggskostnader"}
+          value={selectedElectricianData["Tilleggskostnader"]}
+        />
+        <DisplayInputField
+          label={"Påslag elektriker"}
+          value={selectedElectricianData["Påslag elektriker %"]}
+        />
+        <DisplayInputField
+          label={"Total"}
+          value={selectedElectricianData["Total"]}
+        />
+      </section>
+    </main>
   );
 }

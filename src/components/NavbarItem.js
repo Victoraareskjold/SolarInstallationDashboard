@@ -6,7 +6,7 @@ export default function NavbarItem({ route, name, icon, isNavbarOpen }) {
 
   return (
     <Link href={route || "/"} className="flex gap-3 items-center w-full">
-      <IconComponent size={20} />
+      <IconComponent size={isNavbarOpen ? 20 : 24} />
       {isNavbarOpen && <p className="font-medium">{name || "No name set"}</p>}
     </Link>
   );

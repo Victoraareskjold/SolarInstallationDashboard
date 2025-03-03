@@ -21,11 +21,11 @@ export default function Navbar() {
       className="p-3 gap-8 flex flex-col h-full bg-white shadow-sm max-w-48"
     >
       <Link href="/" className="flex flex-row gap-3 w-full items-center">
-        <HomeIcon color="black" size={20} />
+        <HomeIcon color="black" size={isNavbarOpen ? 20 : 24} />
         {isNavbarOpen && <p className="font-medium text-lg">Dashboard</p>}
       </Link>
 
-      <ul className="flex flex-col h-full gap-4 w-full">
+      <ul className="flex flex-col h-full gap-5 w-full">
         <DropdownMenu
           route="/clients"
           name="Clients"
@@ -33,7 +33,7 @@ export default function Navbar() {
           name1="View all clients"
           route2="/clients/create"
           name2="Create new client"
-          icon="Filter"
+          icon="Users"
           isNavbarOpen={isNavbarOpen}
         />
         <DropdownMenu
@@ -48,17 +48,17 @@ export default function Navbar() {
         <NavbarItem
           route="/profile"
           name="Profile"
-          icon="User"
+          icon="Settings"
           isNavbarOpen={isNavbarOpen}
         />
         <button
           onClick={handleToggleNavbar}
-          className="flex gap-3 items-center w-full"
+          className="flex gap-5 items-center w-full"
         >
           {isNavbarOpen ? (
-            <PanelLeftOpenIcon size={20} />
+            <PanelLeftOpenIcon size={isNavbarOpen ? 20 : 24} />
           ) : (
-            <PanelLeftCloseIcon size={20} />
+            <PanelLeftCloseIcon size={isNavbarOpen ? 20 : 24} />
           )}
           {isNavbarOpen ? <p className="font-medium">Toggle menu</p> : ""}
         </button>

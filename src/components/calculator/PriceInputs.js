@@ -28,11 +28,31 @@ export default function PriceInputs({
                   {priceCategories.map((field) => {
                     let value = data[category]?.[taktype]?.[field] ?? "";
 
+                    if (field === "Påslag i Kr") {
+                      return (
+                        <td key={field} className="border p-2">
+                          <input
+                            type="number"
+                            // Snekker kostnad * 0.15
+                            value={value}
+                            min={0}
+                            readOnly
+                            className="border p-2 w-full"
+                          />
+                        </td>
+                      );
+                    }
+
+                    // Total = snekker kostnad + påslag
+
+                    // Total inkl. mva = total * 1.25
+
                     return (
                       <td key={field} className="border p-2">
                         <input
                           type="number"
-                          value={value === 0 ? "" : value}
+                          value={value}
+                          min={0}
                           onChange={(e) =>
                             handleUpdate(
                               category,

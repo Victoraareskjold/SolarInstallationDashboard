@@ -61,7 +61,7 @@ export const priceFields = {
 export const priceCategories = [
   "Snekker kostnad pr. panel",
   "Påslag elektriker",
-  "Påslag i Kr (pr. panel)",
+  "Påslag i Kr",
   "Total eks. mva",
   "Total inkl. mva",
 ];

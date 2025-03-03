@@ -29,7 +29,7 @@ export default function PriceCalculator() {
     Object.keys(priceFields["Ulike taktekker"])[0]
   );
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
 
   const handleToggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -41,6 +41,8 @@ export default function PriceCalculator() {
     elektriker: 0,
     total: 0,
   });
+  const [panelCount, setPanelCount] = useState(10);
+
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
@@ -87,6 +89,7 @@ export default function PriceCalculator() {
           setSelectedRoof={setSelectedRoof}
           selectedRoof={selectedRoof}
           totals={totals}
+          panelCount={panelCount}
         />
       )}
 

@@ -4,11 +4,7 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import Loading from "@/components/Loading";
-import {
-  allFields,
-  priceFields,
-  priceCategories,
-} from "@/constants/priceFields";
+import { priceFields, categoryFields } from "@/constants/priceFields";
 import { useCalculatePrices } from "@/hooks/useCalculatePrices";
 import PriceDisplay from "@/components/calculator/PriceDisplay";
 import PriceInputs from "@/components/calculator/PriceInputs";
@@ -29,27 +25,24 @@ export default function PriceCalculator() {
     Object.keys(priceFields["Ulike taktekker"])[0]
   );
 
+  const [selectedExtras, setSelectedExtras] = useState([
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+  ]);
   const [isMenuOpen, setIsMenuOpen] = useState(true);
 
   const handleToggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const [totals, setTotals] = useState({
-    snekker: 0,
-    leverandør: 0,
-    elektriker: 0,
-    total: 0,
-  });
   const [panelCount, setPanelCount] = useState(10);
-
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     setData(orgData?.priceCalculator || {});
   }, [orgData]);
-
-  useCalculatePrices({ setTotals, refreshTrigger, selectedRoof });
 
   const handleUpdate = async (category, taktype, field, value) => {
     const updatedData = {
@@ -68,8 +61,6 @@ export default function PriceCalculator() {
     await updateDocData({
       priceCalculator: updatedData,
     });
-
-    setRefreshTrigger((prev) => prev + 1);
   };
 
   if (loading) {
@@ -84,11 +75,11 @@ export default function PriceCalculator() {
       {isMenuOpen && (
         <PriceDisplay
           data={data}
-          allFields={allFields}
           priceFields={priceFields}
           setSelectedRoof={setSelectedRoof}
+          selectedExtras={selectedExtras}
+          setSelectedExtras={setSelectedExtras}
           selectedRoof={selectedRoof}
-          totals={totals}
           panelCount={panelCount}
         />
       )}
@@ -96,7 +87,7 @@ export default function PriceCalculator() {
       <PriceInputs
         data={data}
         priceFields={priceFields}
-        priceCategories={priceCategories}
+        categoryFields={categoryFields}
         handleUpdate={handleUpdate}
       />
     </main>

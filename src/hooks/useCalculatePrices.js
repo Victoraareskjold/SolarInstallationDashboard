@@ -47,7 +47,7 @@ export const useCalculatePrices = ({
         newTotals.elektriker +=
           priceData?.elektriker?.["Tilleggskostnader"] ?? 0;
         newTotals.elektriker +=
-          priceData?.elektriker?.["Påslag elektriker"] ?? 0;
+          priceData?.elektriker?.["Påslag elektriker %"] ?? 0;
 
         //TOTAL KOSTNAD
         /* newTotals.total = Object.entries(newTotals)

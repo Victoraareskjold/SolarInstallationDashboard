@@ -5,7 +5,6 @@ import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import Loading from "@/components/Loading";
 import { priceFields, categoryFields } from "@/constants/priceFields";
-import { useCalculatePrices } from "@/hooks/useCalculatePrices";
 import PriceDisplay from "@/components/calculator/PriceDisplay";
 import PriceInputs from "@/components/calculator/PriceInputs";
 
@@ -25,6 +24,14 @@ export default function PriceCalculator() {
     Object.keys(priceFields["Ulike taktekker"])[0]
   );
 
+  const [selectedPanel, setSelectedPanel] = useState(
+    Object.keys(priceFields["Paneler"])[0]
+  );
+
+  const [selectedFeste, setSelectedFeste] = useState(
+    Object.keys(priceFields["Festemateriell"])[0]
+  );
+
   const [selectedExtras, setSelectedExtras] = useState([
     { type: "", count: 1, cost: 0, markup: 0 },
     { type: "", count: 1, cost: 0, markup: 0 },
@@ -32,6 +39,24 @@ export default function PriceCalculator() {
     { type: "", count: 1, cost: 0, markup: 0 },
     { type: "", count: 1, cost: 0, markup: 0 },
   ]);
+
+  const [selectedInverter, setSelectedInverter] = useState([
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+  ]);
+
+  const [selectedInverter2, setSelectedInverter2] = useState([
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+  ]);
+
+  const [selectedBattery, setSelectedBattery] = useState([
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+  ]);
+
   const [isMenuOpen, setIsMenuOpen] = useState(true);
 
   const handleToggleMenu = () => {
@@ -76,10 +101,20 @@ export default function PriceCalculator() {
         <PriceDisplay
           data={data}
           priceFields={priceFields}
+          selectedRoof={selectedRoof}
           setSelectedRoof={setSelectedRoof}
+          selectedPanel={selectedPanel}
+          setSelectedPanel={setSelectedPanel}
+          selectedFeste={selectedFeste}
+          setSelectedFeste={setSelectedFeste}
+          selectedInverter={selectedInverter}
+          setSelectedInverter={setSelectedInverter}
+          selectedInverter2={selectedInverter2}
+          setSelectedInverter2={setSelectedInverter2}
+          selectedBattery={selectedBattery}
+          setSelectedBattery={setSelectedBattery}
           selectedExtras={selectedExtras}
           setSelectedExtras={setSelectedExtras}
-          selectedRoof={selectedRoof}
           panelCount={panelCount}
         />
       )}

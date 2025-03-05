@@ -7,8 +7,16 @@ export default function PriceInputs({
   return (
     <section className="mb-6">
       {Object.keys(priceFields).map((category) => (
-        <div key={category} className="mb-6">
-          <h2 className="font-semibold text-lg">{category}</h2>
+        <div
+          key={category}
+          className={`${
+            category == "Ulike taktekker" ||
+            category == "Arbeid fra elektriker" ||
+            category == "Tilleggsarbeid fra elektriker"
+              ? "mb-6"
+              : ""
+          }`}
+        >
           <table className="w-full border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-200">

@@ -64,24 +64,21 @@ export default function PriceDisplay({
     const panelWattage = getNumbers(selectedPanel);
     const kwt = (panelCount * panelWattage) / 1000;
 
-    // Lager en mapping mellom inverter-strenger og tallene deres
     const inverterMap = Object.keys(data["Inverter string 230V"]).reduce(
       (acc, inverter) => {
         const num = getNumbers(inverter);
         if (num !== undefined) {
-          acc[Number(num)] = inverter; // Lagrer inverter-strengen med tallet som nøkkel
+          acc[Number(num)] = inverter;
         }
         return acc;
       },
       {}
     );
 
-    // Henter og sorterer tallene fra inverterene
     const sortedInverters = Object.keys(inverterMap)
       .map(Number)
       .sort((a, b) => a - b);
 
-    // Finne riktig inverter basert på kwt
     let selectedInverterKey = sortedInverters[0];
     for (let i = 0; i < sortedInverters.length; i++) {
       if (kwt >= sortedInverters[i]) {
@@ -91,22 +88,21 @@ export default function PriceDisplay({
       }
     }
 
-    const solarDataSelectedInverter = inverterMap[selectedInverterKey]; // Henter inverter-strengen
+    const solarDataSelectedInverter = inverterMap[selectedInverterKey];
 
-    console.log(solarDataSelectedInverter); // Nå får du hele inverter-navnet, ikke bare tallet
-    // Setter standard inverter som første element i listen
+    console.log(solarDataSelectedInverter);
     setSelectedInverter([
       {
         type: solarDataSelectedInverter,
-        count: 1, // Legg til en default verdi for count om det er nødvendig
+        count: 1,
       },
       {
         type: "",
-        count: 1, // Legg til en default verdi for count om det er nødvendig
+        count: 1,
       },
       {
         type: "",
-        count: 1, // Legg til en default verdi for count om det er nødvendig
+        count: 1,
       },
     ]);
   }, [

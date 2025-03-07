@@ -4,6 +4,7 @@ export default function PriceInputs({
   categoryFields,
   handleUpdate,
   handleAddNewRow,
+  handleDeleteRow,
   newCategoryName,
   setNewCategoryName,
 }) {
@@ -20,7 +21,7 @@ export default function PriceInputs({
               : ""
           }`}
         >
-          <table className="w-full border-collapse border border-gray-300">
+          <table className="w-full">
             <thead>
               <tr className="bg-gray-200">
                 <th className="border p-2">{category}</th>
@@ -119,6 +120,14 @@ export default function PriceInputs({
                         </td>
                       );
                     })}
+                    <td className="p-2">
+                      <button
+                        onClick={() => handleDeleteRow(category, inputName)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        x
+                      </button>
+                    </td>
                   </tr>
                 ))}
               <tr>

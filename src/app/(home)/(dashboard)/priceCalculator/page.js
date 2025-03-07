@@ -117,10 +117,21 @@ export default function PriceCalculator() {
     });
   };
 
+  const handleDeleteRow = async (category, inputName) => {
+    const updatedData = { ...data };
+
+    delete updatedData[category][inputName];
+
+    setData(updatedData);
+
+    await updateDocData({
+      priceCalculator: updatedData,
+    });
+  };
+
   if (loading) {
     return <Loading />;
   }
-
   return (
     <main className="defaultContainer">
       <button onClick={handleToggleMenu}>
@@ -154,6 +165,7 @@ export default function PriceCalculator() {
         categoryFields={categoryFields}
         handleUpdate={handleUpdate}
         handleAddNewRow={handleAddNewRow}
+        handleDeleteRow={handleDeleteRow}
         newCategoryName={newCategoryName}
         setNewCategoryName={setNewCategoryName}
       />

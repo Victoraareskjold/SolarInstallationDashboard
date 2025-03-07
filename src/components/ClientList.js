@@ -42,27 +42,15 @@ const ClientList = () => {
   const [stages, setStages] = useState({});
 
   useEffect(() => {
-    if (clients) {
-      const newStages = STAGES.reduce((acc, stage) => {
-        acc[stage] = [];
-        return acc;
-      }, {});
+    if (!clients) return;
 
-      clients.forEach((client) => {
-        const stage = client.followUpStage || "Not set";
-        if (newStages[stage]) {
-          newStages[stage].push(client);
-        }
-      });
+    const initialStages = STAGES.reduce((acc, stage) => {
+      acc[stage] = clients.filter((client) => client.followUpStage === stage);
+      return acc;
+    }, {});
 
-      setStages(newStages);
-    }
+    setStages(initialStages);
   }, [clients, STAGES]);
-
-  const updateFollowUpStage = async (clientId, newStage) => {
-    const clientRef = doc(db, "clients", clientId);
-    await updateDoc(clientRef, { followUpStage: newStage });
-  };
 
   const onDragEnd = async (result) => {
     if (!result.destination) return;
@@ -70,39 +58,47 @@ const ClientList = () => {
     const { source, destination, draggableId } = result;
     const clientId = draggableId;
     const newStage = destination.droppableId;
+    const prevStage = source.droppableId;
 
-    await updateFollowUpStage(clientId, newStage);
+    if (newStage === prevStage) return;
 
     setStages((prevStages) => {
       const updatedStages = { ...prevStages };
 
-      updatedStages[source.droppableId] = updatedStages[
-        source.droppableId
-      ].filter((client) => client.id !== clientId);
+      updatedStages[prevStage] = updatedStages[prevStage].filter(
+        (client) => client.id !== clientId
+      );
 
-      const movedClient = clients.find((client) => client.id === clientId);
+      const movedClient = prevStages[prevStage].find(
+        (client) => client.id === clientId
+      );
 
       if (movedClient) {
-        updatedStages[newStage].push({
-          ...movedClient,
-          followUpStage: newStage,
-        });
+        updatedStages[newStage] = [
+          ...updatedStages[newStage],
+          { ...movedClient, followUpStage: newStage },
+        ];
       }
 
       return updatedStages;
+    });
+
+    await updateDoc(doc(db, "clients", clientId), {
+      followUpStage: newStage,
     });
   };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <section className="flex gap-4 overflow-auto">
+      <section className="flex overflow-auto min-h-96">
         {Object.entries(stages).map(([stage, clients]) => (
           <Droppable key={stage} droppableId={stage}>
             {(provided) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="flex flex-col min-w-[20rem]"
+                className="flex flex-col min-w-[20rem] px-2"
+                style={{ borderRight: "1px solid #ccc" }}
               >
                 <h2 className="text-lg font-bold mb-2 w-fit">{stage}</h2>
 

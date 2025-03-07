@@ -1,8 +1,8 @@
+import { useEffect } from "react";
 import DisplayInputField from "./DisplayInputField";
 
 export default function PriceDisplay({
   data,
-  priceFields,
   selectedRoof,
   setSelectedRoof,
   selectedPanel,
@@ -18,30 +18,99 @@ export default function PriceDisplay({
   selectedExtras,
   setSelectedExtras,
   panelCount,
+  solarDataSelectedPanelType,
 }) {
+  //use state for dropdowns
+  //use state for dropdowns
   //use state for dropdowns
   const selectedRoofData = data["Ulike taktekker"]?.[selectedRoof] || {};
   const selectedPanelData = data["Paneler"]?.[selectedPanel] || {};
   const selectedFesteData = data["Festemateriell"]?.[selectedFeste] || {};
 
   // Shorthands
+  // Shorthands
+  // Shorthands
   const selectedElectricianData = data["Arbeid fra elektriker"] || {};
 
+  //total calculator
+  //total calculator
   //total calculator
   const calculateTotalCost = (items) =>
     items.reduce((sum, item) => sum + item.count * (item.cost || 0), 0);
 
   // Produktvalg
-  const panelCost = selectedPanelData["Kostnad pr. panel"] * panelCount || 0;
+  // Produktvalg
+  // Produktvalg
+  const panelCost = selectedPanelData["Kostnad pr."] * panelCount || 0;
   const festeCost = selectedFesteData["Kostnad pr."] * panelCount || 0;
 
   const inverterCost = calculateTotalCost(selectedInverter);
   const inverterCost2 = calculateTotalCost(selectedInverter2);
   const batteryCost = calculateTotalCost(selectedBattery);
-
   const totalProductCost =
     panelCost + festeCost + inverterCost + inverterCost2 + batteryCost;
+  // Set selectedpanel to paneltype from estimate
+  useEffect(() => {
+    if (
+      Object.keys(data["Paneler"] || {}).includes(solarDataSelectedPanelType)
+    ) {
+      setSelectedPanel(solarDataSelectedPanelType);
+    }
+  }, [data, setSelectedPanel, solarDataSelectedPanelType]);
+  // Find kwt usage and set inverter
+  useEffect(() => {
+    if (!solarDataSelectedPanelType) return;
 
+    const panelWattage = getNumbers(selectedPanel);
+    const kwt = (panelCount * panelWattage) / 1000;
+
+    // Lager en mapping mellom inverter-strenger og tallene deres
+    const inverterMap = Object.keys(data["Inverter string 230V"]).reduce(
+      (acc, inverter) => {
+        const num = getNumbers(inverter);
+        if (num !== undefined) {
+          acc[Number(num)] = inverter; // Lagrer inverter-strengen med tallet som nøkkel
+        }
+        return acc;
+      },
+      {}
+    );
+
+    // Henter og sorterer tallene fra inverterene
+    const sortedInverters = Object.keys(inverterMap)
+      .map(Number)
+      .sort((a, b) => a - b);
+
+    // Finne riktig inverter basert på kwt
+    let selectedInverterKey = sortedInverters[0];
+    for (let i = 0; i < sortedInverters.length; i++) {
+      if (kwt >= sortedInverters[i]) {
+        selectedInverterKey = sortedInverters[i];
+      } else {
+        break;
+      }
+    }
+
+    const solarDataSelectedInverter = inverterMap[selectedInverterKey]; // Henter inverter-strengen
+
+    console.log(solarDataSelectedInverter); // Nå får du hele inverter-navnet, ikke bare tallet
+    // Setter standard inverter som første element i listen
+    setSelectedInverter([
+      {
+        type: solarDataSelectedInverter,
+        count: 1, // Legg til en default verdi for count om det er nødvendig
+      },
+    ]);
+  }, [
+    selectedPanel,
+    panelCount,
+    data,
+    solarDataSelectedPanelType,
+    setSelectedInverter,
+  ]);
+
+  // Snekker
+  // Snekker
   // Snekker
   const snekkerKostnad = selectedRoofData["Snekker kostnad pr. panel"];
   const snekkerTotal = panelCount * snekkerKostnad;
@@ -49,6 +118,8 @@ export default function PriceDisplay({
   const påslagIKr = snekkerTotal * påslagElektriker;
   const snekkerTotalTotal = snekkerTotal + påslagIKr;
 
+  // Elektriker
+  // Elektriker
   // Elektriker
   const elektrikerPåslagIKr1 =
     selectedElectricianData?.["Føring fra tak til inverter"]?.["Kostnad pr."] *
@@ -99,8 +170,12 @@ export default function PriceDisplay({
   const elekriterWorkTotalTotal = elektrikerWorkTotal + elektrikerWorkStillase;
 
   // Elektriker tilleggskostnader
+  // Elektriker tilleggskostnader
+  // Elektriker tilleggskostnader
   const totalExtrasCost = calculateTotalCost(selectedExtras);
 
+  // Generell kode
+  // Generell kode
   // Generell kode
   const handleChange = (
     index,
@@ -121,6 +196,14 @@ export default function PriceDisplay({
 
     setSelectedItems(newItems);
   };
+  // Get panelwattage number
+  const getNumbers = (str) => {
+    let matches = str.match(/(\d+)/);
+
+    if (matches) {
+      return matches[0];
+    }
+  };
 
   return (
     <main className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-3 gap-4">
@@ -135,21 +218,28 @@ export default function PriceDisplay({
             onChange={(e) => setSelectedPanel(e.target.value)}
             className="border p-2 w-full"
           >
-            {Object.keys(priceFields["Paneler"]).map((panel) => (
+            <option value="" disabled hidden>
+              -- Velg panel --
+            </option>
+            {Object.keys(data["Paneler"] || {}).map((panel) => (
               <option key={panel} value={panel}>
                 {panel}
               </option>
             ))}
           </select>
         </div>
+
         <div className="">
           <label className="block font-regular">Type feste</label>
           <select
-            value={selectedPanel}
+            value={selectedFeste}
             onChange={(e) => setSelectedFeste(e.target.value)}
             className="border p-2 w-full"
           >
-            {Object.keys(priceFields["Festemateriell"]).map((feste) => (
+            <option value="" disabled hidden>
+              -- Velg feste --
+            </option>
+            {Object.keys(data["Festemateriell"] || {}).map((feste) => (
               <option key={feste} value={feste}>
                 {feste}
               </option>
@@ -180,9 +270,9 @@ export default function PriceDisplay({
                 className="w-full bg-transparent"
               >
                 <option value="" disabled hidden>
-                  -- Legg inveter string 230V --
+                  -- Legg til inverter string 230V --
                 </option>
-                {Object.keys(priceFields["Inverter string 230V"])
+                {Object.keys(data["Inverter string 230V"] || {})
                   .filter((option) => !selectedValues.includes(option))
                   .map((option) => (
                     <option key={option} value={option}>
@@ -198,7 +288,7 @@ export default function PriceDisplay({
                 onChange={(e) =>
                   handleChange(
                     index,
-                    "type",
+                    "count",
                     e.target.value,
                     selectedInverter,
                     setSelectedInverter,
@@ -233,9 +323,9 @@ export default function PriceDisplay({
                 className="w-full bg-transparent"
               >
                 <option value="" disabled hidden>
-                  -- Legg inveter string 400V --
+                  -- Legg til inverter string 400V --
                 </option>
-                {Object.keys(priceFields["Inverter string 400V"])
+                {Object.keys(data["Inverter string 400V"] || {})
                   .filter((option) => !selectedValues.includes(option))
                   .map((option) => (
                     <option key={option} value={option}>
@@ -251,7 +341,7 @@ export default function PriceDisplay({
                 onChange={(e) =>
                   handleChange(
                     index,
-                    "type",
+                    "count",
                     e.target.value,
                     selectedInverter2,
                     setSelectedInverter2,
@@ -290,7 +380,7 @@ export default function PriceDisplay({
                 <option value="" disabled hidden>
                   -- Legg til batteri --
                 </option>
-                {Object.keys(priceFields["Batteri"])
+                {Object.keys(data["Batteri"] || {})
                   .filter((option) => !selectedValues.includes(option))
                   .map((option) => (
                     <option key={option} value={option}>
@@ -306,7 +396,7 @@ export default function PriceDisplay({
                 onChange={(e) =>
                   handleChange(
                     index,
-                    "type",
+                    "count",
                     e.target.value,
                     selectedBattery,
                     setSelectedBattery,
@@ -332,7 +422,7 @@ export default function PriceDisplay({
 
         <DisplayInputField label={"Panel kostnad"} value={""} />
         <DisplayInputField label={"Feste kostnad"} value={""} />
-        <DisplayInputField label={"Invertert Kostnad"} value={""} />
+        <DisplayInputField label={"Inverter Kostnad"} value={""} />
         <DisplayInputField label={"Batteri kostnad"} value={""} />
         <DisplayInputField label={"Påslag elektriker %"} value={""} />
         <DisplayInputField label={"Total eks. mva"} value={""} />
@@ -341,8 +431,10 @@ export default function PriceDisplay({
       {/* Total kostnad */}
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">Total kostnad</h2>
-
+        {/* Panelkost + feste + inverter + bnatteri !! før påslag */}
         <DisplayInputField label={"Leverandør andel"} value={""} />
+
+        {/* snekkertot +eletot + eletilleggtot + påslag leverandør elektriker */}
         <DisplayInputField label={"Elektro andel + snekker"} value={""} />
         <DisplayInputField label={"Soleklart andel"} value={""} />
         <DisplayInputField label={"Frakt"} value={""} />
@@ -363,7 +455,10 @@ export default function PriceDisplay({
             onChange={(e) => setSelectedRoof(e.target.value)}
             className="border p-2 w-full"
           >
-            {Object.keys(priceFields["Ulike taktekker"]).map((roofName) => (
+            <option value="" disabled hidden>
+              -- Velg taktekke --
+            </option>
+            {Object.keys(data["Ulike taktekker"] || {}).map((roofName) => (
               <option key={roofName} value={roofName}>
                 {roofName}
               </option>
@@ -421,14 +516,21 @@ export default function PriceDisplay({
               <select
                 value={extra.type}
                 onChange={(e) =>
-                  handleExtraChange(index, "type", e.target.value)
+                  handleChange(
+                    index,
+                    "type",
+                    e.target.value,
+                    selectedExtras,
+                    setSelectedExtras,
+                    "Tilleggsarbeid fra elektriker"
+                  )
                 }
                 className="w-full bg-transparent"
               >
                 <option value="" disabled hidden>
                   -- Legg til tilleggskostnad --
                 </option>
-                {Object.keys(priceFields["Tilleggsarbeid fra elektriker"])
+                {Object.keys(data["Tilleggsarbeid fra elektriker"] || {})
                   .filter((option) => !selectedValues.includes(option))
                   .map((option) => (
                     <option key={option} value={option}>
@@ -442,7 +544,14 @@ export default function PriceDisplay({
                 min="0"
                 value={extra.type ? extra.count : 0}
                 onChange={(e) =>
-                  handleExtraChange(index, "count", Number(e.target.value))
+                  handleChange(
+                    index,
+                    "count",
+                    e.target.value,
+                    selectedExtras,
+                    setSelectedExtras,
+                    "Tilleggsarbeid fra elektriker"
+                  )
                 }
                 disabled={!extra.type}
                 className="border p-2 w-full"

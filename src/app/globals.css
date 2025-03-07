@@ -43,6 +43,17 @@ h1 {
   text-align: center;
 }
 
+.smallLightButton {
+  background-color: lightgray;
+  color: darkslategray;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 4px 12px;
+  display: inline-block;
+  text-align: center;
+}
+
 button:hover {
   opacity: 0.8;
 }

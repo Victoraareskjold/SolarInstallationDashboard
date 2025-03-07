@@ -20,17 +20,11 @@ export default function PriceCalculator() {
   const [data, setData] = useState({});
 
   //DROPDOWNS
-  const [selectedRoof, setSelectedRoof] = useState(
-    Object.keys(priceFields["Ulike taktekker"])[0]
-  );
+  const [selectedRoof, setSelectedRoof] = useState("");
 
-  const [selectedPanel, setSelectedPanel] = useState(
-    Object.keys(priceFields["Paneler"])[0]
-  );
+  const [selectedPanel, setSelectedPanel] = useState("");
 
-  const [selectedFeste, setSelectedFeste] = useState(
-    Object.keys(priceFields["Festemateriell"])[0]
-  );
+  const [selectedFeste, setSelectedFeste] = useState("");
 
   const [selectedExtras, setSelectedExtras] = useState([
     { type: "", count: 1, cost: 0, markup: 0 },
@@ -41,6 +35,7 @@ export default function PriceCalculator() {
   ]);
 
   const [selectedInverter, setSelectedInverter] = useState([
+    { type: "", count: 1, cost: 0, markup: 0 },
     { type: "", count: 1, cost: 0, markup: 0 },
     { type: "", count: 1, cost: 0, markup: 0 },
   ]);
@@ -69,19 +64,53 @@ export default function PriceCalculator() {
     setData(orgData?.priceCalculator || {});
   }, [orgData]);
 
-  const handleUpdate = async (category, taktype, field, value) => {
+  const handleUpdate = async (inputName, category, field, value) => {
+    if (!category && !field && value === undefined) {
+      const updatedData = {
+        ...data,
+        [inputName]: {
+          ...data[inputName],
+        },
+      };
+
+      setData(updatedData);
+
+      await updateDocData({
+        priceCalculator: updatedData,
+      });
+      return;
+    }
     const updatedData = {
       ...data,
       [category]: {
         ...data[category],
-        [taktype]: {
-          ...data[category]?.[taktype],
+        [inputName]: {
+          ...data[category]?.[inputName],
           [field]: value,
         },
       },
     };
 
     setData(updatedData);
+
+    await updateDocData({
+      priceCalculator: updatedData,
+    });
+  };
+
+  const [newCategoryName, setNewCategoryName] = useState("");
+
+  const handleAddNewRow = async (category, newCategoryName) => {
+    const updatedData = {
+      ...data,
+      [category]: {
+        ...data[category],
+        [newCategoryName]: {},
+      },
+    };
+
+    setData(updatedData);
+    setNewCategoryName("");
 
     await updateDocData({
       priceCalculator: updatedData,
@@ -124,6 +153,9 @@ export default function PriceCalculator() {
         priceFields={priceFields}
         categoryFields={categoryFields}
         handleUpdate={handleUpdate}
+        handleAddNewRow={handleAddNewRow}
+        newCategoryName={newCategoryName}
+        setNewCategoryName={setNewCategoryName}
       />
     </main>
   );

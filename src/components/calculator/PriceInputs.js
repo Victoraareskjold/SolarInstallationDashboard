@@ -3,6 +3,9 @@ export default function PriceInputs({
   priceFields,
   categoryFields,
   handleUpdate,
+  handleAddNewRow,
+  newCategoryName,
+  setNewCategoryName,
 }) {
   return (
     <section className="mb-6">
@@ -30,92 +33,110 @@ export default function PriceInputs({
               </tr>
             </thead>
             <tbody>
-              {Object.keys(priceFields[category]).map((taktype) => (
-                <tr key={taktype} className="border">
-                  <td className="border p-2 w-80">{taktype}</td>
-                  {categoryFields[category]?.map((field) => {
-                    let value = data[category]?.[taktype]?.[field] ?? "";
-                    let simpleValue = data[category]?.[taktype] ?? "";
+              {data[category] &&
+                Object.keys(data[category]).map((inputName) => (
+                  <tr key={inputName} className="border">
+                    <td className="p-2 w-80">{inputName}</td>
 
-                    // Ulike taktyper
-                    const påslagIKr =
-                      simpleValue?.["Snekker kostnad pr. panel"] *
-                      simpleValue?.["Påslag elektriker %"];
-                    const total =
-                      simpleValue?.["Snekker kostnad pr. panel"] + påslagIKr;
+                    {categoryFields[category]?.map((field) => {
+                      let value = data[category]?.[inputName]?.[field] ?? "";
+                      let simpleValue = data[category]?.[inputName] ?? "";
 
-                    // Arbeid fra elektriker
+                      // Ulike taktyper
+                      const påslagIKr =
+                        simpleValue?.["Snekker kostnad pr. panel"] *
+                        simpleValue?.["Påslag elektriker %"];
+                      const total =
+                        simpleValue?.["Snekker kostnad pr. panel"] + påslagIKr;
 
-                    // Tilleggsarbeid fra elektriker
-                    const påslagIKrElektriker =
-                      simpleValue?.["Kostnad pr."] *
-                      simpleValue?.["Påslag elektriker %"];
-                    const totalElektriker =
-                      simpleValue?.["Kostnad pr."] + påslagIKrElektriker;
+                      // Arbeid fra elektriker
 
-                    // Readonly felter
-                    if (field === "Påslag i Kr") {
+                      // Tilleggsarbeid fra elektriker
+                      const påslagIKrElektriker =
+                        simpleValue?.["Kostnad pr."] *
+                        simpleValue?.["Påslag elektriker %"];
+                      const totalElektriker =
+                        simpleValue?.["Kostnad pr."] + påslagIKrElektriker;
+
+                      // Readonly felter
+                      if (field === "Påslag i Kr") {
+                        return (
+                          <td key={field} className="border p-2">
+                            <input
+                              type="number"
+                              value={påslagIKr || påslagIKrElektriker || ""}
+                              min={0}
+                              readOnly
+                              className="border p-2 w-full"
+                            />
+                          </td>
+                        );
+                      }
+                      if (field === "Total eks. mva") {
+                        return (
+                          <td key={field} className="border p-2">
+                            <input
+                              type="number"
+                              value={total || totalElektriker || ""}
+                              min={0}
+                              readOnly
+                              className="border p-2 w-full"
+                            />
+                          </td>
+                        );
+                      }
+                      if (field === "Total inkl. mva") {
+                        return (
+                          <td key={field} className="border p-2">
+                            <input
+                              type="number"
+                              value={(total || totalElektriker) * 1.25 || ""}
+                              min={0}
+                              readOnly
+                              className="border p-2 w-full"
+                            />
+                          </td>
+                        );
+                      }
+
+                      // Ikke readonly felter
                       return (
                         <td key={field} className="border p-2">
                           <input
                             type="number"
-                            value={påslagIKr || påslagIKrElektriker || ""}
+                            value={value}
                             min={0}
-                            readOnly
+                            onChange={(e) =>
+                              handleUpdate(
+                                inputName,
+                                category,
+                                field,
+                                Number(e.target.value)
+                              )
+                            }
                             className="border p-2 w-full"
                           />
                         </td>
                       );
-                    }
-                    if (field === "Total eks. mva") {
-                      return (
-                        <td key={field} className="border p-2">
-                          <input
-                            type="number"
-                            value={total || totalElektriker || ""}
-                            min={0}
-                            readOnly
-                            className="border p-2 w-full"
-                          />
-                        </td>
-                      );
-                    }
-                    if (field === "Total inkl. mva") {
-                      return (
-                        <td key={field} className="border p-2">
-                          <input
-                            type="number"
-                            value={(total || totalElektriker) * 1.25 || ""}
-                            min={0}
-                            readOnly
-                            className="border p-2 w-full"
-                          />
-                        </td>
-                      );
-                    }
-
-                    // Ikke readonly felter
-                    return (
-                      <td key={field} className="border p-2">
-                        <input
-                          type="number"
-                          value={value}
-                          min={0}
-                          onChange={(e) =>
-                            handleUpdate(
-                              category,
-                              taktype,
-                              field,
-                              Number(e.target.value)
-                            )
-                          }
-                          className="border p-2 w-full"
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
+                    })}
+                  </tr>
+                ))}
+              <tr>
+                <td className="p-2 flex flex-row gap-2">
+                  <input
+                    className="border p-2 w-full"
+                    value={newCategoryName || ""}
+                    placeholder="Add new category"
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                  />
+                  <button
+                    className=""
+                    onClick={() => handleAddNewRow(category, newCategoryName)}
+                  >
+                    Add
+                  </button>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>

@@ -76,32 +76,42 @@ export default function ClientView() {
   return (
     <main className="defaultContainer">
       <BackButton />
-
-      <section>
-        <p>
-          <strong>{clientData?.name}</strong>
-        </p>
-        <p>{clientData?.email}</p>
+      <section className="flex flex-row justify-between items-center">
+        <div>
+          <p>
+            <strong>{clientData?.name}</strong>
+          </p>
+          <p>Addresse: {clientData?.address || "No address set"}</p>
+          <p>E-post: {clientData?.email || "No email set"}</p>
+          <p>Telefon: {clientData?.phone || "No phone number set"}</p>
+        </div>
+        <Link
+          className="darkButton"
+          href={`/clients/create?clientId=${clientId}`}
+        >
+          {hasRoofData ? "View Estimate" : "Create Estimate"}
+        </Link>
       </section>
 
-      <Link
-        className="darkButton"
-        href={`/clients/create?clientId=${clientId}`}
-      >
-        {hasRoofData ? "View Estimate" : "Create Estimate"}
-      </Link>
-
-      <MailThread
-        clientId={clientId}
-        clientData={clientData}
-        filteredMails={filteredMails}
-      />
-      <SendMail
-        clientId={clientId}
-        clientData={clientData}
-        isReply={isReply}
-        lastMailId={lastMailId}
-      />
+      {currentProvider ? (
+        <section>
+          <MailThread
+            clientId={clientId}
+            clientData={clientData}
+            filteredMails={filteredMails}
+          />
+          <SendMail
+            clientId={clientId}
+            clientData={clientData}
+            isReply={isReply}
+            lastMailId={lastMailId}
+          />
+        </section>
+      ) : (
+        <p className="text-center text-red-500 font-regular text-md mt-12">
+          Please configure your mail provider.
+        </p>
+      )}
     </main>
   );
 }

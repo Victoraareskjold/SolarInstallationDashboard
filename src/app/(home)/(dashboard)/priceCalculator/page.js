@@ -1,5 +1,6 @@
 "use client";
 import { useFirestoreDoc } from "@/hooks/useFirestoreDoc";
+import { doc, updateDoc, deleteField } from "firebase/firestore"; // Importer nødvendige Firebase-metoder
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
@@ -101,6 +102,10 @@ export default function PriceCalculator() {
   const [newCategoryName, setNewCategoryName] = useState("");
 
   const handleAddNewRow = async (category, newCategoryName) => {
+    if (newCategoryName.trim() == "") {
+      alert("Field cannot be empty");
+      return;
+    }
     const updatedData = {
       ...data,
       [category]: {
@@ -119,13 +124,11 @@ export default function PriceCalculator() {
 
   const handleDeleteRow = async (category, inputName) => {
     const updatedData = { ...data };
-
     delete updatedData[category][inputName];
-
     setData(updatedData);
-
-    await updateDocData({
-      priceCalculator: updatedData,
+    const docRef = doc(db, "organizations", organizationId);
+    await updateDoc(docRef, {
+      [`priceCalculator.${category}.${inputName}`]: deleteField(),
     });
   };
 

@@ -1,3 +1,18 @@
+import {
+  DeleteIcon,
+  PlusCircle,
+  PlusIcon,
+  Trash2Icon,
+  TrashIcon,
+} from "lucide-react";
+
+const getNumbers = (str) => {
+  let matches = str.match(/(\d+)/);
+  if (matches) {
+    return matches[0];
+  }
+};
+
 export default function PriceInputs({
   data,
   priceFields,
@@ -21,7 +36,7 @@ export default function PriceInputs({
               : ""
           }`}
         >
-          <table className="w-full">
+          <table className="w-full border border-2 border-gray-200">
             <thead>
               <tr className="bg-gray-200">
                 <th className="border p-2">{category}</th>
@@ -35,115 +50,127 @@ export default function PriceInputs({
             </thead>
             <tbody>
               {data[category] &&
-                Object.keys(data[category]).map((inputName) => (
-                  <tr key={inputName} className="border">
-                    <td className="p-2 w-80">{inputName}</td>
+                Object.keys(data[category])
+                  .sort((a, b) => {
+                    const numA = getNumbers(a);
+                    const numB = getNumbers(b);
+                    return numA - numB;
+                  })
+                  .map((inputName) => (
+                    <tr key={inputName} className="border">
+                      <td className="p-2 w-80 w-80">{inputName}</td>
 
-                    {categoryFields[category]?.map((field) => {
-                      let value = data[category]?.[inputName]?.[field] ?? "";
-                      let simpleValue = data[category]?.[inputName] ?? "";
+                      {categoryFields[category]?.map((field) => {
+                        let value = data[category]?.[inputName]?.[field] ?? "";
+                        let simpleValue = data[category]?.[inputName] ?? "";
 
-                      // Ulike taktyper
-                      const påslagIKr =
-                        simpleValue?.["Snekker kostnad pr. panel"] *
-                        simpleValue?.["Påslag elektriker %"];
-                      const total =
-                        simpleValue?.["Snekker kostnad pr. panel"] + påslagIKr;
+                        // Ulike taktyper
+                        const påslagIKr =
+                          simpleValue?.["Snekker kostnad pr. panel"] *
+                          simpleValue?.["Påslag elektriker %"];
+                        const total =
+                          simpleValue?.["Snekker kostnad pr. panel"] +
+                          påslagIKr;
 
-                      // Arbeid fra elektriker
+                        // Arbeid fra elektriker
 
-                      // Tilleggsarbeid fra elektriker
-                      const påslagIKrElektriker =
-                        simpleValue?.["Kostnad pr."] *
-                        simpleValue?.["Påslag elektriker %"];
-                      const totalElektriker =
-                        simpleValue?.["Kostnad pr."] + påslagIKrElektriker;
+                        // Tilleggsarbeid fra elektriker
+                        const påslagIKrElektriker =
+                          simpleValue?.["Kostnad pr."] *
+                          simpleValue?.["Påslag elektriker %"];
+                        const totalElektriker =
+                          simpleValue?.["Kostnad pr."] + påslagIKrElektriker;
 
-                      // Readonly felter
-                      if (field === "Påslag i Kr") {
+                        // Readonly felter
+                        if (field === "Påslag i Kr") {
+                          return (
+                            <td key={field} className="border p-2 w-32">
+                              <input
+                                type="number"
+                                value={påslagIKr || påslagIKrElektriker || ""}
+                                min={0}
+                                placeholder="0"
+                                readOnly
+                                className="border p-2 w-full"
+                              />
+                            </td>
+                          );
+                        }
+                        if (field === "Total eks. mva") {
+                          return (
+                            <td key={field} className="border p-2 w-32">
+                              <input
+                                type="number"
+                                value={total || totalElektriker || ""}
+                                min={0}
+                                placeholder="0"
+                                readOnly
+                                className="border p-2 w-full"
+                              />
+                            </td>
+                          );
+                        }
+                        if (field === "Total inkl. mva") {
+                          return (
+                            <td key={field} className="border p-2 w-32">
+                              <input
+                                type="number"
+                                value={(total || totalElektriker) * 1.25 || ""}
+                                min={0}
+                                placeholder="0"
+                                readOnly
+                                className="border p-2 w-full"
+                              />
+                            </td>
+                          );
+                        }
+
+                        // Ikke readonly felter
                         return (
-                          <td key={field} className="border p-2">
+                          <td key={field} className="border p-2 w-32">
                             <input
                               type="number"
-                              value={påslagIKr || påslagIKrElektriker || ""}
+                              value={value}
                               min={0}
-                              readOnly
+                              placeholder="0"
+                              onChange={(e) =>
+                                handleUpdate(
+                                  inputName,
+                                  category,
+                                  field,
+                                  Number(e.target.value)
+                                )
+                              }
                               className="border p-2 w-full"
                             />
                           </td>
                         );
-                      }
-                      if (field === "Total eks. mva") {
-                        return (
-                          <td key={field} className="border p-2">
-                            <input
-                              type="number"
-                              value={total || totalElektriker || ""}
-                              min={0}
-                              readOnly
-                              className="border p-2 w-full"
-                            />
-                          </td>
-                        );
-                      }
-                      if (field === "Total inkl. mva") {
-                        return (
-                          <td key={field} className="border p-2">
-                            <input
-                              type="number"
-                              value={(total || totalElektriker) * 1.25 || ""}
-                              min={0}
-                              readOnly
-                              className="border p-2 w-full"
-                            />
-                          </td>
-                        );
-                      }
-
-                      // Ikke readonly felter
-                      return (
-                        <td key={field} className="border p-2">
-                          <input
-                            type="number"
-                            value={value}
-                            min={0}
-                            onChange={(e) =>
-                              handleUpdate(
-                                inputName,
-                                category,
-                                field,
-                                Number(e.target.value)
-                              )
-                            }
-                            className="border p-2 w-full"
-                          />
-                        </td>
-                      );
-                    })}
-                    <td className="p-2">
-                      <button
-                        onClick={() => handleDeleteRow(category, inputName)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        x
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      })}
+                      <td className="text-center w-2 h-2">
+                        <button
+                          onClick={() => handleDeleteRow(category, inputName)}
+                          className="text-red-500 hover:text-red-300 duration-200 p-4"
+                        >
+                          <Trash2Icon size={20} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               <tr>
                 <td className="p-2 flex flex-row gap-2">
+                  <button
+                    className="text-blue-500 hover:text-blue-300 duration-200"
+                    onClick={() => handleAddNewRow(category, newCategoryName)}
+                    disabled={newCategoryName.trim() == ""}
+                  >
+                    <PlusCircle size={20} />
+                  </button>
                   <input
                     className="border p-2 w-full"
                     value={newCategoryName || ""}
                     placeholder="Add new category"
                     onChange={(e) => setNewCategoryName(e.target.value)}
                   />
-                  <button
-                    className=""
-                    onClick={() => handleAddNewRow(category, newCategoryName)}
-                  >
-                    Add
-                  </button>
                 </td>
               </tr>
             </tbody>

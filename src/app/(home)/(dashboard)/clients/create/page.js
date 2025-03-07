@@ -169,8 +169,6 @@ export default function CreateClientPage() {
     setIsModalOpen(!isModalOpen);
   };
 
-  console.log(solarData?.selectedPanelType);
-
   return (
     <>
       <main className="defaultContainer">

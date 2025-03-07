@@ -90,7 +90,6 @@ export default function PriceDisplay({
 
     const solarDataSelectedInverter = inverterMap[selectedInverterKey];
 
-    console.log(solarDataSelectedInverter);
     setSelectedInverter([
       {
         type: solarDataSelectedInverter,

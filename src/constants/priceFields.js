@@ -12,11 +12,10 @@ export const priceFields = {
     Integrerte: {},
   },
   "Arbeid fra elektriker": {
-    "Føring fra tak til inveter": {},
+    "Føring fra tak til inverter": {},
     "Sikring + opplegg til inverter": {},
     "Dokumentasjon/søknad til nettselskap": {},
     "Stillase* (gjelder for en side)": {},
-    Befaring: {},
   },
   "Tilleggsarbeid fra elektriker": {
     "Stillase* (gjelder for en side)": {},
@@ -29,18 +28,20 @@ export const priceFields = {
       {},
     "Overspenningsvern ferdig montert": {},
   },
-  "Leverandør kostnad": {
-    // Paneler
+
+  Paneler: {
     "Aiko 440W All black, Mono - 2 generasjon": {},
     "Trina Solar 415W All black": {},
-    // Festemateriell
+  },
+  Festemateriell: {
     "Takstein - VG Solar/Kina": {},
     "Fasade - Rauli/Finland": {},
     "Trapesplater - MS/Tyskland": {},
     "Flatt øst/vest - MS/Tyskland": {},
     "Integrerte ": {},
     "Takstein - MS/Tyskland": {},
-    // inverter string 230v
+  },
+  "Inverter string 230V": {
     "Deye 6kW": {},
     "Deye 8kW": {},
     "Deye 15kW": {},
@@ -48,7 +49,8 @@ export const priceFields = {
     "Deye 25kW": {},
     "Deye 30kW": {},
     "Deye 50kW": {},
-    // inverter string 400v
+  },
+  "Inverter string 400V": {
     "Deye 6kW": {},
     "Deye 8kW": {},
     "Deye 15kW": {},
@@ -56,13 +58,16 @@ export const priceFields = {
     "Deye 25kW": {},
     "Deye 30kW": {},
     "Deye 50kW": {},
-    // inverter hybrid (til batterier) 230v
+  },
+  "Inverter hybrid (til batterier) 230V": {
     "Deye 7,3kW": {},
     "SunSynk 29kW": {},
-    // inverter hybrid (til batteier) 400v
+  },
+  "Inverter hybrid (til batterier) 400V": {
     "Deye 12kW": {},
     "SunSynk 50kW": {},
-    // Batteri
+  },
+  Batteri: {
     "Lavvolt - VW 5,12kWt": {},
     "Lavvolt - VW 10,24kWt": {},
     "Lavvolt - VW 15,36kWt": {},
@@ -94,7 +99,49 @@ export const categoryFields = {
     "Total inkl. mva",
   ],
   // skal stå paneler
-  "Leverandør kostnad": [
+  Paneler: [
+    "Kostnad pr.",
+    "Påslag elektriker %",
+    "Påslag i Kr",
+    "Total eks. mva",
+    "Total inkl. mva",
+  ],
+  Festemateriell: [
+    "Kostnad pr.",
+    "Påslag elektriker %",
+    "Påslag i Kr",
+    "Total eks. mva",
+    "Total inkl. mva",
+  ],
+  "Inverter string 230V": [
+    "Kostnad pr.",
+    "Påslag elektriker %",
+    "Påslag i Kr",
+    "Total eks. mva",
+    "Total inkl. mva",
+  ],
+  "Inverter string 400V": [
+    "Kostnad pr.",
+    "Påslag elektriker %",
+    "Påslag i Kr",
+    "Total eks. mva",
+    "Total inkl. mva",
+  ],
+  "Inverter hybrid (til batterier) 230V": [
+    "Kostnad pr.",
+    "Påslag elektriker %",
+    "Påslag i Kr",
+    "Total eks. mva",
+    "Total inkl. mva",
+  ],
+  "Inverter hybrid (til batterier) 400V": [
+    "Kostnad pr.",
+    "Påslag elektriker %",
+    "Påslag i Kr",
+    "Total eks. mva",
+    "Total inkl. mva",
+  ],
+  Batteri: [
     "Kostnad pr.",
     "Påslag elektriker %",
     "Påslag i Kr",

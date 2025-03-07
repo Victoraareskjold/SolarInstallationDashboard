@@ -68,7 +68,7 @@ export default function MailThread({ clientData, filteredMails }) {
           );
         })
       ) : (
-        <p>Ingen e-poster relatert til denne klienten.</p>
+        <p className="mb-2">Ingen e-poster funnet.</p>
       )}
     </section>
   );

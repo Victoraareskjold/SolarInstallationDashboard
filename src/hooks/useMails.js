@@ -1,13 +1,4 @@
 import { useEffect, useState } from "react";
-import { db } from "@/lib/firebase";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  getDoc,
-  doc,
-} from "firebase/firestore";
 
 const useMails = (userId, provider) => {
   const [mails, setMails] = useState([]);

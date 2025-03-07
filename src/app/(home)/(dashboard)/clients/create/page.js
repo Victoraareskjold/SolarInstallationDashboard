@@ -11,6 +11,9 @@ import BackButton from "@/components/BackButton";
 import { useFirestoreDoc } from "@/hooks/useFirestoreDoc";
 import { useUpdateFirestoreDoc } from "@/hooks/useUpdateFirestoreDoc";
 import { doc, getDoc } from "firebase/firestore";
+import CreateClientField from "@/components/CreateClientFeld";
+import Loading from "@/components/Loading";
+import PriceDisplay from "@/components/calculator/PriceDisplay";
 
 export default function CreateClientPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +23,47 @@ export default function CreateClientPage() {
   const { user, organizationId } = useAuth();
   const [solarData, setSolarData] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
+
+  // Data for priceDisplay
+  const {
+    data: orgData,
+    loading,
+    error: dataError,
+  } = useFirestoreDoc(db, "organizations", organizationId);
+  const [data, setData] = useState({});
+  const [selectedRoof, setSelectedRoof] = useState("");
+  const [selectedPanel, setSelectedPanel] = useState("");
+  const [selectedFeste, setSelectedFeste] = useState("");
+  const [selectedExtras, setSelectedExtras] = useState([
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+  ]);
+  const [selectedInverter, setSelectedInverter] = useState([
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+  ]);
+  const [selectedInverter2, setSelectedInverter2] = useState([
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+  ]);
+  const [selectedBattery, setSelectedBattery] = useState([
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+    { type: "", count: 1, cost: 0, markup: 0 },
+  ]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const handleToggleMenu = (e) => {
+    e.preventDefault();
+    setIsMenuOpen(!isMenuOpen);
+  };
+  useEffect(() => {
+    setData(orgData?.priceCalculator || {});
+  }, [orgData]);
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -75,6 +119,7 @@ export default function CreateClientPage() {
   } = useUpdateFirestoreDoc(db, "clients");
 
   const handleCreateClient = async (e) => {
+    console.log("first");
     e.preventDefault();
 
     if (!solarData) {
@@ -119,208 +164,193 @@ export default function CreateClientPage() {
     }
   };
 
-  const handleToggleModal = () => {
+  const handleToggleModal = (e) => {
+    e.preventDefault();
     setIsModalOpen(!isModalOpen);
   };
 
   return (
     <>
-      <main className="p-2 flex flex-col gap-4 w-full">
-        <div>
-          <h1>Create new client</h1>
-        </div>
+      <main className="defaultContainer">
         <BackButton />
-        <button onClick={handleToggleModal}>
-          {isModalOpen ? "Close pvmap" : "Open pvmap"}
-        </button>
-        <section className="relative flex flex-col">
-          <ImageUploadComponent setImageUrl={setImageUrl} />
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt="Bilde"
-              fill
-              className="object-contain rounded-lg shadow-md"
-            />
-          ) : null}
-        </section>
+        <div>
+          <h1>{clientId ? solarData?.address : "Create new client"}</h1>
+        </div>
+
+        {/* Form */}
         <form
           onSubmit={handleCreateClient}
-          className="flex flex-col gap-3 w-full"
+          className="flex flex-col gap-12 w-full"
         >
-          <label>Fullt navn</label>
+          {/* Client data */}
+          <div className="gap-3 grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
+            <CreateClientField
+              label={"Fullt navn"}
+              value={solarData?.name}
+              setSolarData={setSolarData}
+              field="name"
+            />
+            <CreateClientField
+              label={"E-post"}
+              value={solarData?.email}
+              setSolarData={setSolarData}
+              field="email"
+            />
+            <CreateClientField
+              label={"Telefon"}
+              value={solarData?.phone}
+              setSolarData={setSolarData}
+              field="phone"
+            />
+            <CreateClientField
+              label={"Addresse"}
+              value={solarData?.address}
+              setSolarData={setSolarData}
+              field="address"
+            />
+          </div>
 
-          <input
-            value={solarData?.name || ""}
-            onChange={(e) =>
-              setSolarData((prev) => ({
-                ...prev,
-                name: e.target.value,
-              }))
-            }
-            placeholder="Navn"
-            className="border p-2 w-full"
-          />
+          {/* Strøm data */}
+          <div className="gap-3 grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
+            <CreateClientField
+              label={"Årlig produksjon (kWh)"}
+              value={solarData?.yearlyProd}
+              readOnly
+            />
+            <CreateClientField
+              label={"Strømpris (kr/kWh)"}
+              value={solarData?.selectedElPrice}
+              readOnly
+            />
+            <CreateClientField
+              label={"Taktype"}
+              value={solarData?.selectedRoofType}
+              readOnly
+            />
+            <CreateClientField
+              label={"Paneltype"}
+              value={solarData?.selectedPanelType}
+              readOnly
+              field="selectedPanelType"
+            />
+            <CreateClientField
+              label={"Antall paneler"}
+              value={solarData?.totalPanels}
+              readOnly
+            />
+            <CreateClientField
+              label={"Desired kWh"}
+              value={solarData?.desiredKWh}
+              readOnly
+            />
+            <CreateClientField
+              label={"Coverage %"}
+              value={solarData?.coveragePercentage}
+              readOnly
+            />
+          </div>
 
-          <label>E-post</label>
-          <input
-            value={solarData?.email || ""}
-            onChange={(e) =>
-              setSolarData((prev) => ({
-                ...prev,
-                email: e.target.value,
-              }))
-            }
-            placeholder="E-post"
-            className="border p-2"
-          />
-
-          <label>Telefon</label>
-          <input
-            value={solarData?.phone || ""}
-            onChange={(e) =>
-              setSolarData((prev) => ({
-                ...prev,
-                phone: e.target.value,
-              }))
-            }
-            placeholder="Telefon"
-            className="border p-2"
-          />
-
-          <label>Adresse</label>
-          <input
-            value={solarData?.address || ""}
-            readOnly
-            disabled
-            placeholder="Adresse"
-            className="border p-2"
-          />
-
-          {solarData?.length > 0 && (
+          {solarData?.checkedRoofData?.length > 0 && (
             <div className="flex flex-col gap-3 w-full">
-              <h2 className="font-bold mb-2">Takflater</h2>
-              {solarData.checkedRoofData.map((roof, index) => (
-                <div key={index} className="p-4 mb-2 w-full">
-                  <p>Tak ID: {roof.roofId}</p>
-                  <div className="flex flex-row justify-between gap-2 w-full">
-                    <div className="w-full">
-                      <label>Paneler</label>
-                      <input
-                        value={roof.adjustedPanelCount}
-                        readOnly
-                        disabled
-                        className="border p-2 w-full"
-                      />
-                    </div>
-
-                    <div className="w-full">
-                      <label>Maks paneler</label>
-                      <input
-                        value={roof.maxPanels}
-                        readOnly
-                        disabled
-                        className="border p-2 w-full"
-                      />
-                    </div>
-
-                    <div className="w-full">
-                      <label>Retning</label>
-                      <input
-                        value={roof.direction}
-                        readOnly
-                        disabled
-                        className="border p-2 w-full"
-                      />
-                    </div>
-
-                    <div className="w-full">
-                      <label>Vinkel</label>
-                      <input
-                        value={roof.angle.toFixed(0)}
-                        readOnly
-                        disabled
-                        className="border p-2 w-full"
-                      />
-                    </div>
+              {solarData?.checkedRoofData?.map((roof, index) => (
+                <div key={index} className="p-0 mb-2 w-full">
+                  <div className="gap-3 grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 items-center">
+                    <CreateClientField
+                      label={"Tak ID"}
+                      value={roof.roofId}
+                      readOnly
+                    />
+                    <CreateClientField
+                      label={"Paneler"}
+                      value={roof.adjustedPanelCount}
+                      readOnly
+                    />
+                    <CreateClientField
+                      label={"Maks paneler"}
+                      value={roof.maxPanels}
+                      readOnly
+                    />
+                    <CreateClientField
+                      label={"Retning"}
+                      value={roof.direction}
+                      readOnly
+                    />
+                    <CreateClientField
+                      label={"Vinkel"}
+                      value={roof.angle.toFixed(0)}
+                      readOnly
+                    />
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          <label>Årlig produksjon (kWh)</label>
-          <input
-            value={solarData?.yearlyProd || ""}
-            readOnly
-            disabled
-            placeholder="Årlig produksjon"
-            className="border p-2"
-          />
+          <section>
+            <p>Legg til bilde</p>
+            <div className="relative flex flex-col bg-slate-200 max-w-96">
+              <ImageUploadComponent setImageUrl={setImageUrl} />
+              {/* {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt="Bilde"
+                fill
+                className="object-contain rounded-lg shadow-md"
+              />
+            ) : null} */}
+            </div>
+          </section>
 
-          <label>Strømpris (kr/kWh)</label>
-          <input
-            value={solarData?.selectedElPrice || ""}
-            readOnly
-            disabled
-            placeholder="Strømpris"
-            className="border p-2"
-          />
+          <div className="flex flex-row gap-4">
+            <button
+              onClick={handleToggleMenu}
+              className="smallLightButton max-w-64"
+            >
+              {isMenuOpen ? "Close price menu" : "View price menu"}
+            </button>
+            <button
+              onClick={handleToggleModal}
+              className="smallLightButton max-w-64"
+            >
+              {isModalOpen ? "Close pvmap" : "Open pvmap"}
+            </button>
+            <button
+              disabled={clientLoading}
+              type="submit"
+              className="darkButton max-w-64"
+            >
+              {clientId ? "Update Client" : "Create Client"}
+            </button>
+          </div>
 
-          <label>Taktype</label>
-          <input
-            value={solarData?.selectedRoofType || ""}
-            readOnly
-            disabled
-            placeholder="Taktype"
-            className="border p-2"
-          />
-
-          <label>Paneltype</label>
-          <input
-            value={solarData?.selectedPanelType || ""}
-            readOnly
-            disabled
-            placeholder="Paneltype"
-            className="border p-2"
-          />
-
-          <label>Antall paneler</label>
-          <input
-            value={solarData?.totalPanels || ""}
-            readOnly
-            disabled
-            placeholder="Antall paneler"
-            className="border p-2"
-          />
-
-          <label>Desired kWh</label>
-          <input
-            value={solarData?.desiredKWh || ""}
-            readOnly
-            disabled
-            placeholder="Desired Coverage"
-            className="border p-2"
-          />
-
-          <label>Coverage %</label>
-          <input
-            value={solarData?.coveragePercentage || ""}
-            readOnly
-            disabled
-            placeholder="Coverage %"
-            className="border p-2"
-          />
-
-          <button
-            disabled={clientLoading}
-            type="submit"
-            className="bg-blue-500 text-white p-2 mt-4"
-          >
-            {clientId ? "Update Client" : "Create Client"}
-          </button>
+          <div>
+            {isMenuOpen && (
+              <PriceDisplay
+                data={data}
+                //priceFields={priceFields}
+                selectedRoof={selectedRoof}
+                setSelectedRoof={setSelectedRoof}
+                selectedPanel={selectedPanel}
+                setSelectedPanel={setSelectedPanel}
+                selectedFeste={selectedFeste}
+                setSelectedFeste={setSelectedFeste}
+                selectedInverter={selectedInverter}
+                setSelectedInverter={setSelectedInverter}
+                selectedInverter2={selectedInverter2}
+                setSelectedInverter2={setSelectedInverter2}
+                selectedBattery={selectedBattery}
+                setSelectedBattery={setSelectedBattery}
+                selectedExtras={selectedExtras}
+                setSelectedExtras={setSelectedExtras}
+                panelCount={solarData?.totalPanels}
+                solarDataSelectedPanelType={solarData?.selectedPanelType}
+              />
+            )}
+          </div>
         </form>
       </main>
+
+      {/* Modal */}
       {isModalOpen && (
         <section className="flex h-full absolute inset-0 overflow-none">
           <>

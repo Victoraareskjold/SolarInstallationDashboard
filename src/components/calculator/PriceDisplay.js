@@ -100,6 +100,14 @@ export default function PriceDisplay({
         type: solarDataSelectedInverter,
         count: 1, // Legg til en default verdi for count om det er nødvendig
       },
+      {
+        type: "",
+        count: 1, // Legg til en default verdi for count om det er nødvendig
+      },
+      {
+        type: "",
+        count: 1, // Legg til en default verdi for count om det er nødvendig
+      },
     ]);
   }, [
     selectedPanel,

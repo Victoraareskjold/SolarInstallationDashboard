@@ -88,6 +88,7 @@ export default function PriceCalculator() {
         [inputName]: {
           ...data[category]?.[inputName],
           [field]: value,
+          ...(selectedFeste && { selectedFeste }),
         },
       },
     };
@@ -171,6 +172,7 @@ export default function PriceCalculator() {
         handleDeleteRow={handleDeleteRow}
         newCategoryName={newCategoryName}
         setNewCategoryName={setNewCategoryName}
+        selectedFeste={selectedFeste}
       />
     </main>
   );

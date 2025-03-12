@@ -58,7 +58,32 @@ export default function PriceInputs({
                   })
                   .map((inputName) => (
                     <tr key={inputName} className="border">
-                      <td className="p-2 w-80 w-80">{inputName}</td>
+                      <td className="p-2 w-80 w-80">
+                        {inputName}
+                        {category === "Ulike taktekker" && (
+                          <select
+                            value={
+                              data[category]?.[inputName]?.selectedFeste || ""
+                            }
+                            onChange={(e) =>
+                              handleUpdate(
+                                inputName,
+                                category,
+                                "selectedFeste",
+                                e.target.value
+                              )
+                            }
+                          >
+                            {Object.keys(data["Festemateriell"]).map(
+                              (festeKey) => (
+                                <option key={festeKey} value={festeKey}>
+                                  {festeKey}
+                                </option>
+                              )
+                            )}
+                          </select>
+                        )}
+                      </td>
 
                       {categoryFields[category]?.map((field) => {
                         let value = data[category]?.[inputName]?.[field] ?? "";

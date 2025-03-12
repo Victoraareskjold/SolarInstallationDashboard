@@ -12,6 +12,7 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { useGetMailProvider } from "@/hooks/useGetMailProvider";
 import useMails from "@/hooks/useMails";
 import { useAuth } from "@/context/AuthContext";
+import PriorityDropdown from "@/components/calculator/client/PriorityDropdown";
 
 export default function ClientView() {
   const { clientId } = useParams();
@@ -84,6 +85,7 @@ export default function ClientView() {
           <p>Addresse: {clientData?.address || "No address set"}</p>
           <p>E-post: {clientData?.email || "No email set"}</p>
           <p>Telefon: {clientData?.phone || "No phone number set"}</p>
+          <PriorityDropdown clientId={clientId} clientData={clientData} />
         </div>
         <Link
           className="darkButton"

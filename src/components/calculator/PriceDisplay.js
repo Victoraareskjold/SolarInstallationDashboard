@@ -19,6 +19,7 @@ export default function PriceDisplay({
   setSelectedExtras,
   panelCount,
   solarDataSelectedPanelType,
+  solarDataSelectedRoofType,
 }) {
   //use state for dropdowns
   //use state for dropdowns
@@ -38,9 +39,9 @@ export default function PriceDisplay({
   const calculateTotalCost = (items) =>
     items.reduce((sum, item) => sum + item.count * (item.cost || 0), 0);
 
-  // Produktvalg
-  // Produktvalg
-  // Produktvalg
+  // Produktvalg og leverandør
+  // Produktvalg og leverandør
+  // Produktvalg og leverandør
   const panelCost = selectedPanelData["Kostnad pr."] * panelCount || 0;
   const festeCost = selectedFesteData["Kostnad pr."] * panelCount || 0;
 
@@ -49,6 +50,13 @@ export default function PriceDisplay({
   const batteryCost = calculateTotalCost(selectedBattery);
   const totalProductCost =
     panelCost + festeCost + inverterCost + inverterCost2 + batteryCost;
+
+  const leverandørPåslagElektriker = (
+    selectedPanelData["Påslag elektriker %"] * totalProductCost
+  ).toFixed(0);
+  const leverandørTotalTotal =
+    Number(totalProductCost) + Number(leverandørPåslagElektriker);
+
   // Set selectedpanel to paneltype from estimate
   useEffect(() => {
     if (
@@ -57,6 +65,29 @@ export default function PriceDisplay({
       setSelectedPanel(solarDataSelectedPanelType);
     }
   }, [data, setSelectedPanel, solarDataSelectedPanelType]);
+
+  // Set selectedRoof to rooftype from estimate
+  useEffect(() => {
+    if (
+      Object.keys(data["Ulike taktekker"] || {}).includes(
+        solarDataSelectedRoofType
+      )
+    ) {
+      setSelectedRoof(solarDataSelectedRoofType);
+    }
+  }, [data, setSelectedRoof, solarDataSelectedRoofType]);
+
+  // Set feste based on roofType
+  useEffect(() => {
+    if (!selectedRoof) return;
+
+    const festeForTak = data["Ulike taktekker"]?.[selectedRoof]?.selectedFeste;
+
+    if (festeForTak) {
+      setSelectedFeste(festeForTak);
+    }
+  }, [selectedRoof, data, setSelectedFeste]);
+
   // Find kwt usage and set inverter
   useEffect(() => {
     if (!solarDataSelectedPanelType) return;
@@ -159,16 +190,15 @@ export default function PriceDisplay({
     elektrikerWork1 + elektrikerWork2 + elektrikerWork3;
 
   const elektrikerStillasePåslag =
-    selectedElectricianData?.["Stillase* (gjelder for en side)"]?.[
+    selectedElectricianData?.["Stillase (gjelder for en side)	"]?.[
       "Kostnad pr."
     ] *
-    selectedElectricianData?.["Stillase* (gjelder for en side)"]?.[
+    selectedElectricianData?.["Stillase (gjelder for en side)	"]?.[
       "Påslag elektriker %"
     ];
   const elektrikerWorkStillase =
-    selectedElectricianData["Stillase* (gjelder for en side)"]?.[
-      "Kostnad pr."
-    ] + elektrikerStillasePåslag;
+    selectedElectricianData["Stillase (gjelder for en side)	"]?.["Kostnad pr."] +
+    elektrikerStillasePåslag;
 
   const elekriterWorkTotalTotal = elektrikerWorkTotal + elektrikerWorkStillase;
 
@@ -176,6 +206,27 @@ export default function PriceDisplay({
   // Elektriker tilleggskostnader
   // Elektriker tilleggskostnader
   const totalExtrasCost = calculateTotalCost(selectedExtras);
+
+  // Total kostnad
+  // Total kostnad
+  // Total kostnad
+  const leverandørAndel = Number(totalProductCost);
+  const elektroAndelAndSnekker =
+    Number(snekkerTotalTotal) + Number(elekriterWorkTotalTotal);
+  // Legg til if statement for antall paneler
+  const soleklartAndel = Number(
+    0.28 * (leverandørAndel + elektroAndelAndSnekker)
+  );
+  // 2000 if 36 <= paneler og 4000 if 36 >
+  const frakt = panelCount <= 36 ? 2000 : 4000;
+  const totalSumEksMva =
+    Number(frakt) +
+    Number(soleklartAndel) +
+    Number(leverandørAndel) +
+    Number(elektroAndelAndSnekker);
+  const totalSumInklMva = totalSumEksMva * 1.25;
+  const enovaStøtte = 10000;
+  const sluttkostnad = totalSumInklMva - enovaStøtte;
 
   // Generell kode
   // Generell kode
@@ -423,28 +474,57 @@ export default function PriceDisplay({
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">Leverandør Nordic Solergy</h2>
 
-        <DisplayInputField label={"Panel kostnad"} value={""} />
-        <DisplayInputField label={"Feste kostnad"} value={""} />
-        <DisplayInputField label={"Inverter Kostnad"} value={""} />
-        <DisplayInputField label={"Batteri kostnad"} value={""} />
-        <DisplayInputField label={"Påslag elektriker %"} value={""} />
-        <DisplayInputField label={"Total eks. mva"} value={""} />
+        <DisplayInputField label={"Panel kostnad"} value={panelCost || 0} />
+        <DisplayInputField label={"Feste kostnad"} value={festeCost || 0} />
+        <DisplayInputField
+          label={"Inverter Kostnad"}
+          value={inverterCost + inverterCost2 || 0}
+        />
+        <DisplayInputField label={"Batteri kostnad"} value={batteryCost || 0} />
+        <DisplayInputField
+          label={"Påslag elektriker i kr."}
+          value={leverandørPåslagElektriker || 0}
+        />
+        <DisplayInputField
+          label={"Total eks. mva"}
+          value={leverandørTotalTotal || 0}
+        />
       </section>
 
       {/* Total kostnad */}
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">Total kostnad</h2>
-        {/* Panelkost + feste + inverter + bnatteri !! før påslag */}
-        <DisplayInputField label={"Leverandør andel"} value={""} />
+        <DisplayInputField
+          label={"Leverandør andel"}
+          value={leverandørAndel || 0}
+        />
 
         {/* snekkertot +eletot + eletilleggtot + påslag leverandør elektriker */}
-        <DisplayInputField label={"Elektro andel + snekker"} value={""} />
-        <DisplayInputField label={"Soleklart andel"} value={""} />
-        <DisplayInputField label={"Frakt"} value={""} />
-        <DisplayInputField label={"Total SUM eks. mva"} value={""} />
-        <DisplayInputField label={"Total SUM inkl. mva"} value={""} />
-        <DisplayInputField label={"Enova støtte"} value={""} />
-        <DisplayInputField label={"Sluttkostnad"} value={""} />
+        <DisplayInputField
+          label={"Elektro andel + snekker"}
+          value={elektroAndelAndSnekker.toFixed(0) || 0}
+        />
+        <DisplayInputField
+          label={"Soleklart andel"}
+          value={soleklartAndel.toFixed(0) || 0}
+        />
+        <DisplayInputField label={"Frakt"} value={frakt.toFixed(0) || 0} />
+        <DisplayInputField
+          label={"Total SUM eks. mva"}
+          value={totalSumEksMva.toFixed(0) || 0}
+        />
+        <DisplayInputField
+          label={"Total SUM inkl. mva"}
+          value={totalSumInklMva.toFixed(0) || 0}
+        />
+        <DisplayInputField
+          label={"Enova støtte"}
+          value={enovaStøtte.toFixed(0) || 0}
+        />
+        <DisplayInputField
+          label={"Sluttkostnad"}
+          value={sluttkostnad.toFixed(0) || 0}
+        />
       </section>
 
       {/* Snekker section */}
@@ -497,7 +577,7 @@ export default function PriceDisplay({
           value={elektrikerWorkTotal || 0}
         />
         <DisplayInputField
-          label={"Stillase* (gjelder for en side) + påslag"}
+          label={"Stillase (gjelder for en side)	 + påslag"}
           value={elektrikerWorkStillase || 0}
         />
         <DisplayInputField
@@ -567,7 +647,7 @@ export default function PriceDisplay({
           value={totalExtrasCost || 0}
         />
         <DisplayInputField
-          label="Påslag elektriker %"
+          label="Påslag elektriker i kr."
           value={totalExtrasCost * 0.2 || 0}
         />
         <DisplayInputField

@@ -344,6 +344,7 @@ export default function CreateClientPage() {
                 setSelectedExtras={setSelectedExtras}
                 panelCount={solarData?.totalPanels}
                 solarDataSelectedPanelType={solarData?.selectedPanelType}
+                solarDataSelectedRoofType={solarData?.selectedRoofType}
               />
             )}
           </div>

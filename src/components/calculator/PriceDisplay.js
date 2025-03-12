@@ -120,11 +120,16 @@ export default function PriceDisplay({
     }
 
     const solarDataSelectedInverter = inverterMap[selectedInverterKey];
+    const inverterCost =
+      data["Inverter string 230V"][solarDataSelectedInverter]?.[
+        "Kostnad pr."
+      ] || 0;
 
     setSelectedInverter([
       {
         type: solarDataSelectedInverter,
         count: 1,
+        cost: inverterCost,
       },
       {
         type: "",

@@ -100,7 +100,7 @@ export default function PriceCalculator() {
     });
   };
 
-  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryName, setNewCategoryName] = useState({});
 
   const handleAddNewRow = async (category, newCategoryName) => {
     if (newCategoryName.trim() == "") {

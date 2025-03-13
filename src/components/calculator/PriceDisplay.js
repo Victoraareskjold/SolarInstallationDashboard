@@ -159,52 +159,36 @@ export default function PriceDisplay({
 
   // Elektriker
   // Elektriker
-  // Elektriker
-  const elektrikerPåslagIKr1 =
-    selectedElectricianData?.["Føring fra tak til inverter"]?.["Kostnad pr."] *
-    selectedElectricianData?.["Føring fra tak til inverter"]?.[
-      "Påslag elektriker %"
-    ];
-  const elektrikerWork1 =
-    selectedElectricianData["Føring fra tak til inverter"]?.["Kostnad pr."] +
-    elektrikerPåslagIKr1;
+  const elektrikerWorkTotal = Object.entries(selectedElectricianData).reduce(
+    (total, [key, values]) => {
+      if (!values || typeof values !== "object") return total; // Sjekker at verdien er et objekt
 
-  const elektrikerPåslagIKr2 =
-    selectedElectricianData?.["Sikring + opplegg til inverter"]?.[
-      "Kostnad pr."
-    ] *
-    selectedElectricianData?.["Sikring + opplegg til inverter"]?.[
-      "Påslag elektriker %"
-    ];
-  const elektrikerWork2 =
-    selectedElectricianData["Sikring + opplegg til inverter"]?.["Kostnad pr."] +
-    elektrikerPåslagIKr2;
+      const kostnad = values["Kostnad pr."] || 0;
+      const påslag = values["Påslag elektriker %"] || 0;
 
-  const elektrikerPåslagIKr3 =
-    selectedElectricianData?.["Dokumentasjon/søknad til nettselskap"]?.[
-      "Kostnad pr."
-    ] *
-    selectedElectricianData?.["Dokumentasjon/søknad til nettselskap"]?.[
-      "Påslag elektriker %"
-    ];
-  const elektrikerWork3 =
-    selectedElectricianData["Dokumentasjon/søknad til nettselskap"]?.[
-      "Kostnad pr."
-    ] + elektrikerPåslagIKr3;
-  const elektrikerWorkTotal =
-    elektrikerWork1 + elektrikerWork2 + elektrikerWork3;
+      // Legger til kostnad + påslag for arbeid
+      return total + kostnad + kostnad * påslag;
+    },
+    0
+  );
 
-  const elektrikerStillasePåslag =
-    selectedElectricianData?.["Stillase (gjelder for en side)	"]?.[
-      "Kostnad pr."
-    ] *
-    selectedElectricianData?.["Stillase (gjelder for en side)	"]?.[
-      "Påslag elektriker %"
-    ];
-  const elektrikerWorkStillase =
-    selectedElectricianData["Stillase (gjelder for en side)	"]?.["Kostnad pr."] +
-    elektrikerStillasePåslag;
+  // Dynamisk beregning av stillasekostnader
+  const elektrikerWorkStillase = Object.entries(selectedElectricianData).reduce(
+    (total, [key, values]) => {
+      // Sjekker om nøkkelen inneholder ordet "stillase"
+      if (key.toLowerCase().includes("stillase")) {
+        const kostnad = values["Kostnad pr."] || 0;
+        const påslag = values["Påslag elektriker %"] || 0;
 
+        // Legger til stillasekostnaden + påslag
+        total += kostnad + kostnad * påslag;
+      }
+      return total;
+    },
+    0
+  );
+
+  // Samler totalsummen for elektrikerarbeid og stillasekostnader
   const elekriterWorkTotalTotal = elektrikerWorkTotal + elektrikerWorkStillase;
 
   // Elektriker tilleggskostnader

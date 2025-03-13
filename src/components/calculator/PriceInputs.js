@@ -23,6 +23,13 @@ export default function PriceInputs({
   newCategoryName,
   setNewCategoryName,
 }) {
+  const handleCategoryNameChange = (category, value) => {
+    setNewCategoryName((prevState) => ({
+      ...prevState,
+      [category]: value,
+    }));
+  };
+
   return (
     <section className="mb-6">
       {Object.keys(priceFields).map((category) => (
@@ -39,10 +46,10 @@ export default function PriceInputs({
           <table className="w-full border border-2 border-gray-200">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border p-2">{category}</th>
+                <th className="border p-2 text-start w-96">{category}</th>
 
                 {categoryFields[category]?.map((field) => (
-                  <th key={field} className="border p-2">
+                  <th key={field} className="border p-2 text-start w-96">
                     {field}
                   </th>
                 ))}
@@ -58,10 +65,11 @@ export default function PriceInputs({
                   })
                   .map((inputName) => (
                     <tr key={inputName} className="border">
-                      <td className="p-2 w-80 w-80">
+                      <td className="p-2 w-full flex flex-col">
                         {inputName}
                         {category === "Ulike taktekker" && (
                           <select
+                            className="input w-full"
                             value={
                               data[category]?.[inputName]?.selectedFeste || ""
                             }
@@ -74,6 +82,9 @@ export default function PriceInputs({
                               )
                             }
                           >
+                            <option hidden disabled value="">
+                              -- Velg feste --
+                            </option>
                             {Object.keys(data["Festemateriell"]).map(
                               (festeKey) => (
                                 <option key={festeKey} value={festeKey}>
@@ -109,7 +120,7 @@ export default function PriceInputs({
                         // Readonly felter
                         if (field === "Påslag i Kr") {
                           return (
-                            <td key={field} className="border p-2 w-32">
+                            <td key={field} className="border p-2 w-64">
                               <input
                                 type="number"
                                 value={påslagIKr || påslagIKrElektriker || ""}
@@ -123,7 +134,7 @@ export default function PriceInputs({
                         }
                         if (field === "Total eks. mva") {
                           return (
-                            <td key={field} className="border p-2 w-32">
+                            <td key={field} className="border p-2 w-64">
                               <input
                                 type="number"
                                 value={total || totalElektriker || ""}
@@ -137,7 +148,7 @@ export default function PriceInputs({
                         }
                         if (field === "Total inkl. mva") {
                           return (
-                            <td key={field} className="border p-2 w-32">
+                            <td key={field} className="border p-2 w-64">
                               <input
                                 type="number"
                                 value={(total || totalElektriker) * 1.25 || ""}
@@ -152,7 +163,7 @@ export default function PriceInputs({
 
                         // Ikke readonly felter
                         return (
-                          <td key={field} className="border p-2 w-32">
+                          <td key={field} className="border p-2 w-64">
                             <input
                               type="number"
                               value={value}
@@ -185,16 +196,20 @@ export default function PriceInputs({
                 <td className="p-2 flex flex-row gap-2">
                   <button
                     className="text-blue-500 hover:text-blue-300 duration-200"
-                    onClick={() => handleAddNewRow(category, newCategoryName)}
-                    disabled={newCategoryName.trim() == ""}
+                    onClick={() =>
+                      handleAddNewRow(category, newCategoryName[category] || "")
+                    }
+                    disabled={newCategoryName[category]?.trim() === ""}
                   >
                     <PlusCircle size={20} />
                   </button>
                   <input
-                    className="border p-2 w-full"
-                    value={newCategoryName || ""}
+                    className="border p-2 w-96"
+                    value={newCategoryName[category] || ""}
                     placeholder="Add new category"
-                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    onChange={(e) =>
+                      handleCategoryNameChange(category, e.target.value)
+                    }
                   />
                 </td>
               </tr>

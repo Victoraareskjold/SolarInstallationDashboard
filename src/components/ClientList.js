@@ -7,6 +7,25 @@ import ClientCard from "./ClientCard";
 import { useState, useEffect, useMemo } from "react";
 import { updateDoc, doc } from "firebase/firestore";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+const STAGES = [
+  "Not set",
+  "Oppfølging 1 [Prisestimat Sendt]",
+  "Oppfølging 2",
+  "Oppfølging 3",
+  "Oppfølging 4",
+  "Oppfølging 5",
+  "FEILKORRIGERINGSOMRÅDE",
+  "Tilleggsinformasjon Nødvendig",
+  "Dialog 1 [Dialog Start]",
+  "Nærings kunder [Dialog start]",
+  "Befaringsprosess",
+  "Dialog 2 [Tilbud Sendt]",
+  "Dialog 3 [Signering Etterspurt]",
+  "Salg Fullført & Avtale Signert",
+  "Anlegg Ferdigmontert",
+  "Ikke interessert",
+  "Nyhetsbrev (Langsiktig Nurturing)",
+];
 
 const ClientList = () => {
   const { user, organizationId, loading } = useAuth();
@@ -16,41 +35,28 @@ const ClientList = () => {
     organizationId,
   ]);
 
-  const STAGES = useMemo(
-    () => [
-      "Not set",
-      "Oppfølging 1 [Prisestimat Sendt]",
-      "Oppfølging 2",
-      "Oppfølging 3",
-      "Oppfølging 4",
-      "Oppfølging 5",
-      "FEILKORRIGERINGSOMRÅDE",
-      "Tilleggsinformasjon Nødvendig",
-      "Dialog 1 [Dialog Start]",
-      "Nærings kunder [Dialog start]",
-      "Befaringsprosess",
-      "Dialog 2 [Tilbud Sendt]",
-      "Dialog 3 [Signering Etterspurt]",
-      "Salg Fullført & Avtale Signert",
-      "Anlegg Ferdigmontert",
-      "Ikke interessert",
-      "Nyhetsbrev (Langsiktig Nurturing)",
-    ],
-    []
-  );
-
   const [stages, setStages] = useState({});
 
   useEffect(() => {
     if (!clients) return;
 
     const initialStages = STAGES.reduce((acc, stage) => {
-      acc[stage] = clients.filter((client) => client.followUpStage === stage);
+      acc[stage] = [];
       return acc;
     }, {});
 
-    setStages(initialStages);
-  }, [clients, STAGES]);
+    clients.forEach((client) => {
+      const stage = client.followUpStage || "Not set";
+      initialStages[stage].push(client);
+    });
+
+    setStages((prevStages) => {
+      if (JSON.stringify(prevStages) === JSON.stringify(initialStages)) {
+        return prevStages;
+      }
+      return initialStages;
+    });
+  }, [clients]);
 
   const onDragEnd = async (result) => {
     if (!result.destination) return;
